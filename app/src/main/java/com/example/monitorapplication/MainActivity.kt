@@ -23,7 +23,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var lastMagnetometer = FloatArray(3)
     private var stepCount = 0
     private var distance = 0.0
-    private var direction = 0.0
 
     private val rotationMatrix = FloatArray(9)
     private val orientationAngles = FloatArray(3)
@@ -86,11 +85,53 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 binding.tvStepCount.text = "Steps: $stepCount"
                 binding.tvDistance.text = "Distance: $distance"
 
+                if (lastMagnetometer.isNotEmpty()) {
+                    val rotationMatrix = FloatArray(9)
+                    val inclinationMatrix = FloatArray(9)
+
+                    // Compute the rotation matrix and inclination matrix
+                    SensorManager.getRotationMatrix(rotationMatrix, inclinationMatrix, gravity, lastMagnetometer)
+
+                    // Get the orientation angles from the rotation matrix
+                    val orientation = FloatArray(3)
+                    SensorManager.getOrientation(rotationMatrix, orientation)
+
+                    // Convert the orientation angles from radians to degrees
+                    val azimuth = Math.toDegrees(orientation[0].toDouble())
+
+                    // Compute the direction of movement
+                    val direction = calculateDirection(azimuth)
+
+                    // Update the UI with the direction
+                    binding.tvDirection.text = "Direction: $direction"
+                }
             }
             Sensor.TYPE_MAGNETIC_FIELD -> {
-
+                lastMagnetometer = event.values
             }
         }
+    }
+
+    private fun calculateDirection(azimuth: Double): String {
+        var direction = ""
+        if (azimuth >= -22.5 && azimuth < 22.5) {
+            direction = "North"
+        } else if (azimuth >= 22.5 && azimuth < 67.5) {
+            direction = "Northeast"
+        } else if (azimuth >= 67.5 && azimuth < 112.5) {
+            direction = "East"
+        } else if (azimuth >= 112.5 && azimuth < 157.5) {
+            direction = "Southeast"
+        } else if (azimuth >= 157.5 || azimuth < -157.5) {
+            direction = "South"
+        } else if (azimuth >= -157.5 && azimuth < -112.5) {
+            direction = "Southwest"
+        } else if (azimuth >= -112.5 && azimuth< -67.5) {
+            direction = "West"
+        } else if (azimuth >= -67.5 && azimuth < -22.5) {
+            direction = "Northwest"
+        }
+        return direction
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
