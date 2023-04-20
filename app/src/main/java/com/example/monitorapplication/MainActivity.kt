@@ -60,11 +60,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent) {
         when(event.sensor.type){
             Sensor.TYPE_ACCELEROMETER -> {
+                //comment here
                 val gravity = FloatArray(3)
                 gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
                 gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
                 gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
 
+                //comment here
                 val linearAcceleration = FloatArray(3)
                 linearAcceleration[0] = event.values[0] - gravity[0]
                 linearAcceleration[1] = event.values[1] - gravity[1]
@@ -77,12 +79,15 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                             linearAcceleration[2].toDouble().pow(2.0)
                 )
 
+                //comment here
                 if (accelerationMagnitude > 12 && accelerationMagnitude < 20) { // adjust this threshold to suit your needs
                     stepCount++
                     distance += strideLength
                 }
 
+                // updating the UI with step count
                 binding.tvStepCount.text = "Steps: $stepCount"
+                // updating the UI with distance
                 binding.tvDistance.text = "Distance: $distance"
 
                 if (lastMagnetometer.isNotEmpty()) {
@@ -102,17 +107,19 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     // Compute the direction of movement
                     val direction = calculateDirection(azimuth)
 
-                    // Update the UI with the direction
+                    // updating the UI with the direction
                     binding.tvDirection.text = "Direction: $direction"
                 }
             }
             Sensor.TYPE_MAGNETIC_FIELD -> {
+                // comment here
                 lastMagnetometer = event.values
             }
         }
     }
 
     private fun calculateDirection(azimuth: Double): String {
+        // comment here
         var direction = ""
         if (azimuth >= -22.5 && azimuth < 22.5) {
             direction = "North"
