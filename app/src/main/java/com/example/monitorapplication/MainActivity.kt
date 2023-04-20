@@ -20,11 +20,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private val alpha = 0.8f
     private var gravity: FloatArray = floatArrayOf(0f, 0f, 0f)
-    private var geomagnetic: FloatArray = floatArrayOf(0f, 0f, 0f)
-    private var azimuth = 0f
-    private var lastAzimuth = 0f
-    private var stepCount = 0
-    private var distance = 0f
+    private var linearAcceleration: FloatArray = floatArrayOf(0f, 0f, 0f)
+
+    private val rotationMatrix = FloatArray(9)
+    private val orientationAngles = FloatArray(3)
+
+
     private var strideLength = 0f
 
 
@@ -56,19 +57,18 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent) {
         when(event.sensor.type){
             Sensor.TYPE_ACCELEROMETER -> {
+                gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
+                gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
+                gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
 
+                linearAcceleration[0] = event.values[0] - gravity[0]
+                linearAcceleration[1] = event.values[1] - gravity[1]
+                linearAcceleration[2] = event.values[2] - gravity[2]
             }
             Sensor.TYPE_MAGNETIC_FIELD -> {
 
             }
         }
-    }
-
-    private fun lowPassFilter(input: FloatArray, output: FloatArray): FloatArray {
-        for (i in input.indices) {
-            output[i] = output[i] + alpha * (input[i] - output[i])
-        }
-        return output
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
