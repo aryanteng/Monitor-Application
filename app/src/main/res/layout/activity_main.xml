@@ -9,24 +9,32 @@
         android:id="@+id/tv_step_count"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="@color/theme"
+        android:fontFamily="@font/medium"
         android:textSize="24sp" />
 
     <TextView
         android:id="@+id/tv_distance"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="@color/theme"
+        android:fontFamily="@font/medium"
         android:textSize="24sp" />
 
     <TextView
         android:id="@+id/tv_direction"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="@color/theme"
+        android:fontFamily="@font/medium"
         android:textSize="24sp" />
 
     <TextView
         android:id="@+id/tv_lift_or_stairs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="@color/theme"
+        android:fontFamily="@font/medium"
         android:textSize="24sp" />
 
 </LinearLayout>
