@@ -18,14 +18,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var accelerometer: Sensor
     private lateinit var magnetometer: Sensor
 
-    private val alpha = 0.8f
-    private var lastAccelerometer = FloatArray(3)
     private var lastMagnetometer = FloatArray(3)
     private var stepCount = 0
     private var distance = 0.0
 
-    private val rotationMatrix = FloatArray(9)
-    private val orientationAngles = FloatArray(3)
+    private var liftThreshold: Float = 2.5f // adjust as necessary
+    private var stairsThreshold: Float = 10f // adjust as necessary
+    private var isOnStairs: Boolean = false
+    private var isOnLift: Boolean = false
 
 
     private var strideLength = 0f
@@ -61,6 +61,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         when(event.sensor.type){
             Sensor.TYPE_ACCELEROMETER -> {
                 //comment here
+                val alpha = 0.08f
                 val gravity = FloatArray(3)
                 gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
                 gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
@@ -83,12 +84,28 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 if (accelerationMagnitude > 12 && accelerationMagnitude < 20) { // adjust this threshold to suit your needs
                     stepCount++
                     distance += strideLength
+                    if (linearAcceleration[2] > liftThreshold) {
+                        isOnLift = true
+                        isOnStairs = false
+                    } else if (linearAcceleration[2] > stairsThreshold) {
+                        isOnStairs = true
+                        isOnLift = false
+                    } else {
+                        isOnStairs = false
+                        isOnLift = false
+                    }
                 }
 
                 // updating the UI with step count
                 binding.tvStepCount.text = "Steps: $stepCount"
                 // updating the UI with distance
                 binding.tvDistance.text = "Distance: $distance"
+                if(isOnLift){
+                    binding.tvLiftOrStairs.text = "Lift"
+                }
+                if(isOnStairs){
+                    binding.tvLiftOrStairs.text = "Stairs"
+                }
 
                 if (lastMagnetometer.isNotEmpty()) {
                     val rotationMatrix = FloatArray(9)
