@@ -7,10 +7,13 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.example.monitorapplication.databinding.ActivityMainBinding
 import kotlin.math.pow
 import kotlin.math.sqrt
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
+    private lateinit var binding: ActivityMainBinding
+
     private lateinit var sensorManager: SensorManager
     private lateinit var accelerometer: Sensor
     private lateinit var magnetometer: Sensor
@@ -28,7 +31,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)

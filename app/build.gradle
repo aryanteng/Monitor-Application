@@ -7,6 +7,10 @@ android {
     namespace 'com.example.monitorapplication'
     compileSdk 33
 
+    buildFeatures {
+        viewBinding = true
+    }
+
     defaultConfig {
         applicationId "com.example.monitorapplication"
         minSdk 24
