@@ -23,7 +23,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var geomagnetic: FloatArray = floatArrayOf(0f, 0f, 0f)
     private var azimuth = 0f
     private var lastAzimuth = 0f
-    private var lastStepCount = 0
     private var stepCount = 0
     private var distance = 0f
     private var strideLength = 0f
@@ -55,57 +54,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent) {
-        if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
-            gravity = lowPassFilter(event.values.clone(), gravity)
-            val acceleration = event.values.clone()
-            acceleration[0] -= gravity[0]
-            acceleration[1] -= gravity[1]
-            acceleration[2] -= gravity[2]
+        when(event.sensor.type){
+            Sensor.TYPE_ACCELEROMETER -> {
 
-            val norm = sqrt(
-                acceleration[0].toDouble().pow(2.0) +
-                        acceleration[1].toDouble().pow(2.0) +
-                        acceleration[2].toDouble().pow(2.0)
-            ).toFloat()
-
-            // Check if user has taken a step
-            if (norm > 11.5f && norm < 19.6f) {
-                stepCount++ // Increment step count
-                distance += strideLength // Increment distance travelled
             }
-//            stepCountTextView.text = "Steps: ${stepCount}"
-//            distanceTextView.text = "Distance: ${String.format("%.2f", distance)} m"
-        }
-        else if (event.sensor.type == Sensor.TYPE_MAGNETIC_FIELD) {
-            geomagnetic = lowPassFilter(event.values.clone(), geomagnetic)
-            val rotationMatrix = FloatArray(9)
-            val inclinationMatrix = FloatArray(9)
-            val success = SensorManager.getRotationMatrix(
-                rotationMatrix,
-                inclinationMatrix,
-                gravity,
-                geomagnetic
-            )
-            if (success) {
-                val orientation = FloatArray(3)
-                SensorManager.getOrientation(rotationMatrix, orientation)
-                azimuth = Math.toDegrees(orientation[0].toDouble()).toFloat()
-                if (lastAzimuth == 0f) {
-                    lastAzimuth = azimuth
-                } else {
-                    // Determine the direction of movement
-                    val diff = azimuth - lastAzimuth
-                    if (diff > 180) {
-                        lastAzimuth += 360
-                    } else if (diff < -180) {
-                        lastAzimuth -= 360
-                    }
-                    val direction = if (lastAzimuth < azimuth) "North" else "South"
-                    lastAzimuth = azimuth
+            Sensor.TYPE_MAGNETIC_FIELD -> {
 
-                    // Update UI with direction of movement
-//                    directionTextView.text = "Direction: $direction"
-                }
             }
         }
     }
