@@ -19,8 +19,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var magnetometer: Sensor
 
     private val alpha = 0.8f
-    private var gravity: FloatArray = floatArrayOf(0f, 0f, 0f)
-    private var linearAcceleration: FloatArray = floatArrayOf(0f, 0f, 0f)
+    private var lastAccelerometer = FloatArray(3)
+    private var lastMagnetometer = FloatArray(3)
+    private var stepCount = 0
+    private var distance = 0.0
+    private var direction = 0.0
 
     private val rotationMatrix = FloatArray(9)
     private val orientationAngles = FloatArray(3)
@@ -39,8 +42,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
-        val height = 170 // user's height in cm
-        strideLength = 0.415f * height // calculate stride length
+        val height = 170
+        val weight = 80
+        strideLength = (0.415 * height.toDouble().pow(1.12) - (weight * 0.036)).toFloat()
     }
 
     override fun onResume() {
@@ -57,13 +61,31 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent) {
         when(event.sensor.type){
             Sensor.TYPE_ACCELEROMETER -> {
+                val gravity = FloatArray(3)
                 gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
                 gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
                 gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
 
+                val linearAcceleration = FloatArray(3)
                 linearAcceleration[0] = event.values[0] - gravity[0]
                 linearAcceleration[1] = event.values[1] - gravity[1]
                 linearAcceleration[2] = event.values[2] - gravity[2]
+
+                // Compute the acceleration magnitude
+                val accelerationMagnitude = sqrt(
+                    linearAcceleration[0].toDouble().pow(2.0) +
+                            linearAcceleration[1].toDouble().pow(2.0) +
+                            linearAcceleration[2].toDouble().pow(2.0)
+                )
+
+                if (accelerationMagnitude > 12 && accelerationMagnitude < 20) { // adjust this threshold to suit your needs
+                    stepCount++
+                    distance += strideLength
+                }
+
+                binding.tvStepCount.text = "Steps: $stepCount"
+                binding.tvDistance.text = "Distance: $distance"
+
             }
             Sensor.TYPE_MAGNETIC_FIELD -> {
 
