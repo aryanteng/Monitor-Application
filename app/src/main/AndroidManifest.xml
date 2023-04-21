@@ -15,6 +15,7 @@
         android:label="Step Up"
         android:supportsRtl="true"
         android:theme="@style/Theme.MonitorApplication"
+        android:hardwareAccelerated="true"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"

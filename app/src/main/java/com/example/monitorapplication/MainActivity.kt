@@ -11,6 +11,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.example.monitorapplication.databinding.ActivityMainBinding
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -60,17 +61,21 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         Configuration.getInstance().userAgentValue = packageName
 
-        binding.map.setTileSource(TileSourceFactory.MAPNIK)
+        binding.map.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
         binding.map.setBuiltInZoomControls(true)
         binding.map.setMultiTouchControls(true)
-        binding.map.controller.setZoom(15.0)
+        binding.map.controller.setZoom(8.0)
 
         val currentLocation = getCurrentLocation()
+        Log.i("BKL", currentLocation.toString())
         if (currentLocation != null) {
             val currentGeoPoint = GeoPoint(currentLocation.latitude, currentLocation.longitude)
             val currentMarker = Marker(binding.map)
+            currentMarker.icon = ContextCompat.getDrawable(this, com.google.android.material.R.drawable.mtrl_ic_arrow_drop_up)
+            currentMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
             currentMarker.position = currentGeoPoint
             binding.map.overlays.add(currentMarker)
+            binding.map.controller.setCenter(currentGeoPoint)
         }
     }
 
@@ -231,6 +236,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val locationListener = object : LocationListener {
             override fun onLocationChanged(location: Location) {
+                locationManager.removeUpdates(this)
                 // Called when the user's location has changed
             }
 
@@ -251,6 +257,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED
         ) {
+
             locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER,
                 0,
@@ -258,13 +265,28 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 locationListener
             )
 
-            // Get the last known location
-            return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            // Wait for the callback to return the current location
+            val timeout = 5000 // Timeout in milliseconds
+            var elapsed = 0
+            while (elapsed < timeout) {
+                val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                Log.i("mkc", location.toString())
+                if (location != null) {
+                    return location
+                } else {
+                    Thread.sleep(100)
+                    elapsed += 100
+                }
+            }
+
+            // Timeout waiting for location update
+            return null
         } else {
             // Permission denied
             return null
         }
     }
+
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
 
