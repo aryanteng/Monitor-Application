@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
-        val height = 170
+        val height = 177
         val weight = 80
         strideLength = (0.415 * height.toDouble().pow(1.12) - (weight * 0.036)).toFloat()
 
