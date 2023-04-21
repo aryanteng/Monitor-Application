@@ -1,13 +1,23 @@
 package com.example.monitorapplication
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.core.content.ContextCompat
 import com.example.monitorapplication.databinding.ActivityMainBinding
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polyline
+import org.osmdroid.config.Configuration
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -22,13 +32,15 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var stepCount = 0
     private var distance = 0.0
 
-    private var liftThreshold: Float = 2.5f // adjust as necessary
-    private var stairsThreshold: Float = 10f // adjust as necessary
+    private var liftThreshold: Float = 2.5f
+    private var stairsThreshold: Float = 10f
     private var isOnStairs: Boolean = false
     private var isOnLift: Boolean = false
 
 
     private var strideLength = 0f
+
+    private val recordedTrajectory = mutableListOf<Pair<Double, Double>>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,6 +56,22 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val height = 170
         val weight = 80
         strideLength = (0.415 * height.toDouble().pow(1.12) - (weight * 0.036)).toFloat()
+
+
+        Configuration.getInstance().userAgentValue = packageName
+
+        binding.map.setTileSource(TileSourceFactory.MAPNIK)
+        binding.map.setBuiltInZoomControls(true)
+        binding.map.setMultiTouchControls(true)
+        binding.map.controller.setZoom(15.0)
+
+        val currentLocation = getCurrentLocation()
+        if (currentLocation != null) {
+            val currentGeoPoint = GeoPoint(currentLocation.latitude, currentLocation.longitude)
+            val currentMarker = Marker(binding.map)
+            currentMarker.position = currentGeoPoint
+            binding.map.overlays.add(currentMarker)
+        }
     }
 
     override fun onResume() {
@@ -84,6 +112,19 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 if (accelerationMagnitude > 12 && accelerationMagnitude < 20) { // adjust this threshold to suit your needs
                     stepCount++
                     distance += strideLength
+
+                    val location = getCurrentLocation()
+
+                    if (location != null) {
+                        // Record the user's location in the trajectory recorder
+                        recordLocation(location.latitude, location.longitude)
+
+                        // Update the map view with the new trajectory
+                        updateMapViewWithTrajectory()
+                    }
+
+
+
                     if (linearAcceleration[2] > liftThreshold) {
                         isOnLift = true
                         isOnStairs = false
@@ -156,6 +197,73 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             direction = "Northwest"
         }
         return direction
+    }
+
+    private fun drawPolylineOnMap(points: List<Pair<Double, Double>>) {
+        val polyline = Polyline().apply {
+            points.map { org.osmdroid.util.GeoPoint(it.first, it.second) }
+            isGeodesic = true
+            infoWindow = null
+        }
+        binding.map.overlays.add(polyline)
+        binding.map.invalidate()
+    }
+
+    private fun updateMapViewWithTrajectory() {
+        // Clear any existing overlays on the map
+        binding.map.overlays.clear()
+
+        // Draw a polyline representing the user's trajectory
+        drawPolylineOnMap(recordedTrajectory)
+
+        // Set the map view center to the last point in the trajectory
+        val lastPoint = recordedTrajectory.lastOrNull()
+        if (lastPoint != null) {
+            binding.map.controller.setCenter(org.osmdroid.util.GeoPoint(lastPoint.first, lastPoint.second))
+        }
+    }
+
+    private fun recordLocation(latitude: Double, longitude: Double) {
+        recordedTrajectory.add(Pair(latitude, longitude))
+    }
+
+    private fun getCurrentLocation(): Location? {
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationListener = object : LocationListener {
+            override fun onLocationChanged(location: Location) {
+                // Called when the user's location has changed
+            }
+
+            override fun onProviderEnabled(provider: String) {
+                // Called when the user enables the location provider (e.g. GPS)
+            }
+
+            override fun onProviderDisabled(provider: String) {
+                // Called when the user disables the location provider (e.g. GPS)
+            }
+
+            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+                // Called when the location provider status changes (e.g. enabled, disabled)
+            }
+        }
+
+        // Request location updates
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
+                0,
+                0f,
+                locationListener
+            )
+
+            // Get the last known location
+            return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+        } else {
+            // Permission denied
+            return null
+        }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
