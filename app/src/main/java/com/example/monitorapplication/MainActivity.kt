@@ -33,8 +33,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var stepCount = 0
     private var distance = 0.0
 
-    private var liftThreshold: Float = 2.5f
-    private var stairsThreshold: Float = 10f
+    private var liftThreshold: Float = 1.5f
+    private var stairsThreshold: Float = 2.5f
     private var isOnStairs: Boolean = false
     private var isOnLift: Boolean = false
 
@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 )
 
                 //comment here
-                if (accelerationMagnitude > 8 && accelerationMagnitude < 20) { // adjust this threshold to suit your needs
+                if (accelerationMagnitude > 1.2 && accelerationMagnitude < 8) {
                     stepCount++
                     distance += strideLength
 
@@ -127,17 +127,17 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                         // Update the map view with the new trajectory
                         updateMapViewWithTrajectory()
                     }
+                }
 
-                    if (linearAcceleration[2] > liftThreshold) {
-                        isOnLift = true
-                        isOnStairs = false
-                    } else if (linearAcceleration[2] > stairsThreshold) {
-                        isOnStairs = true
-                        isOnLift = false
-                    } else {
-                        isOnStairs = false
-                        isOnLift = false
-                    }
+                if (linearAcceleration[2] > liftThreshold) {
+                    isOnLift = true
+                    isOnStairs = false
+                } else if (linearAcceleration[2] > stairsThreshold) {
+                    isOnStairs = true
+                    isOnLift = false
+                } else {
+                    isOnStairs = false
+                    isOnLift = false
                 }
 
                 // updating the UI with step count
