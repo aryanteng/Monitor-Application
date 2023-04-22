@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 )
 
                 //comment here
-                if (accelerationMagnitude > 12 && accelerationMagnitude < 20) { // adjust this threshold to suit your needs
+                if (accelerationMagnitude > 8 && accelerationMagnitude < 20) { // adjust this threshold to suit your needs
                     stepCount++
                     distance += strideLength
 
@@ -127,8 +127,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                         // Update the map view with the new trajectory
                         updateMapViewWithTrajectory()
                     }
-
-
 
                     if (linearAcceleration[2] > liftThreshold) {
                         isOnLift = true
