@@ -144,6 +144,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 binding.tvStepCount.text = "Steps: $stepCount"
                 // updating the UI with distance
                 binding.tvDistance.text = "Distance: $distance m"
+
                 if(isOnLift){
                     binding.tvLiftOrStairs.text = "Lift"
                 }
