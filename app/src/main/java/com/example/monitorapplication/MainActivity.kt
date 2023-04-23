@@ -58,8 +58,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
-
-        setContentView(R.layout.activity_main)
         setContentView(view)
 
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
