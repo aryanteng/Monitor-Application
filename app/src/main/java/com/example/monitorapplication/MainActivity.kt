@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         Configuration.getInstance().userAgentValue = packageName
 
-        binding.map.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
+        binding.map.setTileSource(TileSourceFactory.MAPNIK)
         binding.map.setBuiltInZoomControls(true)
         binding.map.setMultiTouchControls(true)
         binding.map.controller.setZoom(20.0)
@@ -123,7 +123,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     distance += strideLength / 2
 
                     getCurrentLocation()
-
                 }
 
                 if (linearAcceleration[2] > liftThreshold) {
@@ -294,7 +293,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         if (location != null) {
             // If the location is not null, update the UI with the current location
             val currentMarker = Marker(binding.map)
-            currentMarker.icon = ContextCompat.getDrawable(applicationContext, com.google.android.material.R.drawable.ic_arrow_back_black_24)
+            currentMarker.icon = ContextCompat.getDrawable(applicationContext, com.google.android.material.R.drawable.ic_clock_black_24dp)
             currentMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
             currentMarker.position = GeoPoint(location.latitude, location.longitude)
             binding.map.overlays.add(currentMarker)
