@@ -262,7 +262,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             GeoPoint(28.523206, 77.225825),
         )
 
-        for (item in dummy) {
+        for (item in recordedTrajectory) {
             path.addPoint(item)
         }
 
@@ -289,7 +289,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         if (location != null) {
             // If the location is not null, update the UI with the current location
             updateMapUI(location)
-            // code for testing
         } else {
             // If the location is null, request location updates
             val locationRequest = LocationRequest.create().apply {
