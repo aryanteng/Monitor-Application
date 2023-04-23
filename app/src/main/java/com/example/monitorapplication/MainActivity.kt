@@ -7,7 +7,6 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
-import android.location.LocationListener
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -21,6 +20,18 @@ import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.config.Configuration
 import kotlin.math.pow
 import kotlin.math.sqrt
+import android.Manifest
+import android.graphics.Color
+import android.graphics.DashPathEffect
+import android.graphics.Paint
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
+import android.os.Looper
+import androidx.core.app.ActivityCompat
+import com.google.android.gms.maps.model.LatLng
+
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var binding: ActivityMainBinding
@@ -66,19 +77,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         binding.map.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
         binding.map.setBuiltInZoomControls(true)
         binding.map.setMultiTouchControls(true)
-        binding.map.controller.setZoom(15.0)
+        binding.map.controller.setZoom(20.0)
 
-        val currentLocation = getCurrentLocation()
-        Log.i("BKL", currentLocation.toString())
-        if (currentLocation == null) {
-//            val currentGeoPoint = GeoPoint(currentLocation.latitude, currentLocation.longitude)
-            val currentMarker = Marker(binding.map)
-            currentMarker.icon = ContextCompat.getDrawable(this, com.google.android.material.R.drawable.mtrl_ic_arrow_drop_up)
-            currentMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-            currentMarker.position = GeoPoint(51.5074, 0.1278)
-            binding.map.overlays.add(currentMarker)
-            binding.map.controller.setCenter(GeoPoint(51.5074, 0.1278))
-        }
+        getCurrentLocation()
 
     }
 
@@ -119,17 +120,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 //comment here
                 if (accelerationMagnitude > 1 && accelerationMagnitude < 3) {
                     stepCount++
-                    distance += strideLength/2
+                    distance += strideLength / 2
 
-                    val location = getCurrentLocation()
+                    getCurrentLocation()
 
-                    if (location != null) {
-                        // Record the user's location in the trajectory recorder
-                        recordLocation(location.latitude, location.longitude)
-
-                        // Update the map view with the new trajectory
-                        updateMapViewWithTrajectory()
-                    }
                 }
 
                 if (linearAcceleration[2] > liftThreshold) {
@@ -206,88 +200,151 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         return direction
     }
 
-    private fun drawPolylineOnMap(points: List<Pair<Double, Double>>) {
-        val polyline = Polyline().apply {
-            points.map { org.osmdroid.util.GeoPoint(it.first, it.second) }
-            isGeodesic = true
-            infoWindow = null
-        }
-        binding.map.overlays.add(polyline)
-        binding.map.invalidate()
-    }
-
     private fun updateMapViewWithTrajectory() {
-        // Clear any existing overlays on the map
-        binding.map.overlays.clear()
+        Log.d("TAG", "updateMapViewWithTrajectory called")
 
-        // Draw a polyline representing the user's trajectory
-        drawPolylineOnMap(recordedTrajectory)
+        val path = Polyline(binding.map)
+        path.outlinePaint.color = Color.BLUE
+        path.outlinePaint.strokeWidth = 7.0f
+        path.outlinePaint.strokeCap = Paint.Cap.ROUND
 
-        // Set the map view center to the last point in the trajectory
-        val lastPoint = recordedTrajectory.lastOrNull()
-        if (lastPoint != null) {
-            binding.map.controller.setCenter(org.osmdroid.util.GeoPoint(lastPoint.first, lastPoint.second))
+        val dashInterval = 20.0f
+        val gapInterval = 50.0f
+        val effect = DashPathEffect(floatArrayOf(dashInterval, gapInterval), 0.0f)
+        path.outlinePaint.pathEffect = effect
+
+//        val dummy = listOf(
+//            LatLng(37.422160, -122.084270),
+//            LatLng(37.422180, -122.084290),
+//            LatLng(37.422200, -122.084310),
+//            LatLng(37.422220, -122.084330),
+//            LatLng(37.422240, -122.084350),
+//            LatLng(37.422260, -122.084370),
+//            LatLng(37.422280, -122.084390),
+//            LatLng(37.422300, -122.084410),
+//            LatLng(37.422320, -122.084430),
+//            LatLng(37.422340, -122.084450),
+//            LatLng(37.422360, -122.084470),
+//            LatLng(37.422380, -122.084490),
+//            LatLng(37.422400, -122.084510),
+//            LatLng(37.422420, -122.084530),
+//            LatLng(37.422440, -122.084550),
+//            LatLng(37.422460, -122.084570),
+//            LatLng(37.422480, -122.084590),
+//            LatLng(37.422500, -122.084610),
+//            LatLng(37.422520, -122.084630),
+//            LatLng(37.422540, -122.084650),
+//            LatLng(37.422560, -122.084670),
+//            LatLng(37.422580, -122.084690),
+//            LatLng(37.422600, -122.084710),
+//            LatLng(37.422610, -122.084700), // slight left turn
+//            LatLng(37.422620, -122.084690), // slight left turn
+//            LatLng(37.422640, -122.084670), // slight right turn
+//            LatLng(37.422660, -122.084650), // sharp right turn
+//            LatLng(37.422680, -122.084630), // sharp left turn
+//            LatLng(37.422700, -122.084610), // slight left turn
+//            LatLng(37.422720, -122.084590),
+//            LatLng(37.422740, -122.084570),
+//            LatLng(37.422760, -122.084550),
+//            LatLng(37.422780, -122.084530),
+//            LatLng(37.422800, -122.084510),
+//            LatLng(37.422820, -122.084490),
+//            LatLng(37.422840, -122.084470),
+//            LatLng(37.422860, -122.084450),
+//            LatLng(37.422880, -122.084430),
+//            LatLng(37.422900, -122.084410),
+//            LatLng(37.422920, -122.084390),
+//            LatLng(37.422940, -122.084370),
+//            LatLng(37.422960, -122.084350),
+//            LatLng(37.422980, -122.084330),
+//            LatLng(37.423000, -122.084310),
+//            LatLng(37.423020, -122.084290),
+//            LatLng(37.423040, -122.084270),
+//            LatLng(37.423060, -122.084250), // slight left turn
+//            LatLng(37.423080, -122.084230), // slight right turn
+//            LatLng(37.423100, -122.084210),
+//            LatLng(37.423120, -122.084190),
+//        )
+//
+        for (item in recordedTrajectory) {
+            val point = GeoPoint(item.first, item.second)
+            path.addPoint(point)
         }
+
+        binding.map.overlays.add(path)
+        binding.map.invalidate()
     }
 
     private fun recordLocation(latitude: Double, longitude: Double) {
         recordedTrajectory.add(Pair(latitude, longitude))
     }
 
-    private fun getCurrentLocation(): Location? {
+    private fun getCurrentLocation() {
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val locationListener = object : LocationListener {
-            override fun onLocationChanged(location: Location) {
-                locationManager.removeUpdates(this)
-                // Called when the user's location has changed
-            }
 
-            override fun onProviderEnabled(provider: String) {
-                // Called when the user enables the location provider (e.g. GPS)
-            }
-
-            override fun onProviderDisabled(provider: String) {
-                // Called when the user disables the location provider (e.g. GPS)
-            }
-
-            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-                // Called when the location provider status changes (e.g. enabled, disabled)
-            }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Request the permission to access the location if it is not already granted
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 123)
+            return
         }
 
-        // Request location updates
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED
-        ) {
+        // Get the last known location from the location manager
+        val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+        if (location != null) {
+            // If the location is not null, update the UI with the current location
+            val currentMarker = Marker(binding.map)
+            currentMarker.icon = ContextCompat.getDrawable(applicationContext, com.google.android.material.R.drawable.ic_arrow_back_black_24)
+            currentMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            currentMarker.position = GeoPoint(location.latitude, location.longitude)
+            binding.map.overlays.add(currentMarker)
+            binding.map.controller.setCenter(GeoPoint(location.latitude, location.longitude))
+//            currentMarker.position = GeoPoint(37.422160, -122.084270)
+//            binding.map.overlays.add(currentMarker)
+//            binding.map.controller.setCenter(GeoPoint(37.422160,-122.084270 ))
+            updateLocationUI(location)
+            recordLocation(location.latitude, location.longitude)
+            updateMapViewWithTrajectory()
 
-            locationManager.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER,
-                0,
-                0f,
-                locationListener
-            )
+        } else {
+            // If the location is null, request location updates
+            val locationRequest = LocationRequest.create().apply {
+                priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+                interval = 10000
+                fastestInterval = 5000
+            }
 
-            // Wait for the callback to return the current location
-            val timeout = 5000 // Timeout in milliseconds
-            var elapsed = 0
-            while (elapsed < timeout) {
-                val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                Log.i("mkc", location.toString())
-                if (location != null) {
-                    return location
-                } else {
-                    Thread.sleep(100)
-                    elapsed += 100
+            val locationCallback = object : LocationCallback() {
+                override fun onLocationResult(locationResult: LocationResult) {
+                    val location = locationResult.lastLocation
+                    if (location != null) {
+                        val currentMarker = Marker(binding.map)
+                        currentMarker.icon = ContextCompat.getDrawable(applicationContext, com.google.android.material.R.drawable.mtrl_ic_arrow_drop_up)
+                        currentMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        currentMarker.position = GeoPoint(location.latitude, location.longitude)
+                        binding.map.overlays.add(currentMarker)
+                        binding.map.controller.setCenter(GeoPoint(location.latitude, location.longitude))
+
+                        // Record the user's location in the trajectory recorder
+                        recordLocation(location.latitude, location.longitude)
+                        // Update the map view with the new trajectory
+                        updateMapViewWithTrajectory()
+                    }
                 }
             }
 
-            // Timeout waiting for location update
-            return null
-        } else {
-            // Permission denied
-            return null
+            // Request location updates
+            val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+            fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
         }
     }
+
+    private fun updateLocationUI(location: Location) {
+        // Update the UI with the current location
+        Log.d("LOCATION", "Current location: ${location.latitude}, ${location.longitude}")
+        // You can use the location object to perform your desired functionality here
+    }
+
 
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
