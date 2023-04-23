@@ -75,6 +75,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         binding.map.setMultiTouchControls(true)
         binding.map.controller.setZoom(20.0)
 
+        recordedTrajectory.clear()
+
         getCurrentLocation()
 
     }
@@ -91,7 +93,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent) {
-        when(event.sensor.type){
+        when (event.sensor.type){
             Sensor.TYPE_ACCELEROMETER -> {
                 //comment here
                 val alpha = 0.08f
@@ -136,11 +138,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
                 if(isOnLift){
                     Toast.makeText(this, "Lift", Toast.LENGTH_SHORT).show()
-                    binding.tvLiftOrStairs.text = "Lift"
+//                    binding.tvLiftOrStairs.text = "Lift"
                 }
                 if(isOnStairs){
                     Toast.makeText(this, "Stairs", Toast.LENGTH_SHORT).show()
-                    binding.tvLiftOrStairs.text = "Stairs"
+//                    binding.tvLiftOrStairs.text = "Stairs"
                 }
 
                 if (lastMagnetometer.isNotEmpty()) {
