@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 )
 
                 //comment here
-                if (accelerationMagnitude > 1 && accelerationMagnitude < 2.5) {
+                if (accelerationMagnitude > 0.8 && accelerationMagnitude < 1.5) {
                     stepCount++
                     distance += strideLength / 2
 
@@ -132,6 +132,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 binding.tvStepCount.text = "Steps: $stepCount"
                 // updating the UI with distance
                 binding.tvDistance.text = "Distance: $distance m"
+
+                binding.tvLiftOrStairs.text = "Magnitude: $accelerationMagnitude"
 
                 if(isOnLift){
                     Toast.makeText(this, "Lift", Toast.LENGTH_SHORT)
