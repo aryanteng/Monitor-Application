@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/theme"
         android:fontFamily="@font/medium"
-        android:textSize="24sp" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/tv_distance"
@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/theme"
         android:fontFamily="@font/medium"
-        android:textSize="24sp" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/tv_direction"
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/theme"
         android:fontFamily="@font/medium"
-        android:textSize="24sp" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/tv_lift_or_stairs"
@@ -35,13 +35,12 @@
         android:layout_height="wrap_content"
         android:textColor="@color/theme"
         android:fontFamily="@font/medium"
-        android:textSize="24sp" />
+        android:textSize="20sp" />
 
     <org.osmdroid.views.MapView
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
         />
 
 </LinearLayout>
