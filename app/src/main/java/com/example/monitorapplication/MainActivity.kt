@@ -48,6 +48,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
+
+        setContentView(R.layout.activity_main)
         setContentView(view)
 
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -64,19 +66,20 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         binding.map.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
         binding.map.setBuiltInZoomControls(true)
         binding.map.setMultiTouchControls(true)
-        binding.map.controller.setZoom(8.0)
+        binding.map.controller.setZoom(15.0)
 
         val currentLocation = getCurrentLocation()
         Log.i("BKL", currentLocation.toString())
-        if (currentLocation != null) {
-            val currentGeoPoint = GeoPoint(currentLocation.latitude, currentLocation.longitude)
+        if (currentLocation == null) {
+//            val currentGeoPoint = GeoPoint(currentLocation.latitude, currentLocation.longitude)
             val currentMarker = Marker(binding.map)
             currentMarker.icon = ContextCompat.getDrawable(this, com.google.android.material.R.drawable.mtrl_ic_arrow_drop_up)
             currentMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-            currentMarker.position = currentGeoPoint
+            currentMarker.position = GeoPoint(51.5074, 0.1278)
             binding.map.overlays.add(currentMarker)
-            binding.map.controller.setCenter(currentGeoPoint)
+            binding.map.controller.setCenter(GeoPoint(51.5074, 0.1278))
         }
+
     }
 
     override fun onResume() {
@@ -116,7 +119,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 //comment here
                 if (accelerationMagnitude > 1 && accelerationMagnitude < 3) {
                     stepCount++
-                    distance += strideLength
+                    distance += strideLength/2
 
                     val location = getCurrentLocation()
 
@@ -288,6 +291,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-
+        // mandatory hook for sensor event listener
     }
 }
