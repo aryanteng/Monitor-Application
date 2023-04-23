@@ -66,9 +66,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
-        val height = 177
+        val height = 1.77
         val weight = 80
-        strideLength = (0.415 * height.toDouble().pow(1.12) - (weight * 0.036)).toFloat()
+        strideLength = (0.415 * height.pow(1.12) - (weight * 0.036)).toFloat()
 
 
         Configuration.getInstance().userAgentValue = packageName
@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 // updating the UI with step count
                 binding.tvStepCount.text = "Steps: $stepCount"
                 // updating the UI with distance
-                binding.tvDistance.text = "Distance: $distance cm"
+                binding.tvDistance.text = "Distance: $distance m"
 
                 if(isOnLift){
                     Toast.makeText(this, "Lift", Toast.LENGTH_SHORT)
