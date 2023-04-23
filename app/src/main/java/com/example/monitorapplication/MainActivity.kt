@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 )
 
                 //comment here
-                if (accelerationMagnitude > 1.2 && accelerationMagnitude < 8) {
+                if (accelerationMagnitude > 1 && accelerationMagnitude < 3) {
                     stepCount++
                     distance += strideLength
 
