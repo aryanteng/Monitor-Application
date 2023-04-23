@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private var strideLength = 0f
 
-    private val recordedTrajectory = mutableListOf<Pair<Double, Double>>()
+    private val recordedTrajectory = mutableListOf<GeoPoint>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         Configuration.getInstance().userAgentValue = packageName
 
-        binding.map.setTileSource(TileSourceFactory.MAPNIK)
+        binding.map.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
         binding.map.setBuiltInZoomControls(true)
         binding.map.setMultiTouchControls(true)
         binding.map.controller.setZoom(20.0)
@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 )
 
                 //comment here
-                if (accelerationMagnitude > 1 && accelerationMagnitude < 3) {
+                if (accelerationMagnitude > 1) {
                     stepCount++
                     distance += strideLength / 2
 
@@ -203,7 +203,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         Log.d("TAG", "updateMapViewWithTrajectory called")
 
         val path = Polyline(binding.map)
-        path.outlinePaint.color = Color.BLUE
+        path.outlinePaint.color = Color.parseColor("#4286F4")
         path.outlinePaint.strokeWidth = 7.0f
         path.outlinePaint.strokeCap = Paint.Cap.ROUND
 
@@ -212,62 +212,60 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val effect = DashPathEffect(floatArrayOf(dashInterval, gapInterval), 0.0f)
         path.outlinePaint.pathEffect = effect
 
-//        val dummy = listOf(
-//            LatLng(37.422160, -122.084270),
-//            LatLng(37.422180, -122.084290),
-//            LatLng(37.422200, -122.084310),
-//            LatLng(37.422220, -122.084330),
-//            LatLng(37.422240, -122.084350),
-//            LatLng(37.422260, -122.084370),
-//            LatLng(37.422280, -122.084390),
-//            LatLng(37.422300, -122.084410),
-//            LatLng(37.422320, -122.084430),
-//            LatLng(37.422340, -122.084450),
-//            LatLng(37.422360, -122.084470),
-//            LatLng(37.422380, -122.084490),
-//            LatLng(37.422400, -122.084510),
-//            LatLng(37.422420, -122.084530),
-//            LatLng(37.422440, -122.084550),
-//            LatLng(37.422460, -122.084570),
-//            LatLng(37.422480, -122.084590),
-//            LatLng(37.422500, -122.084610),
-//            LatLng(37.422520, -122.084630),
-//            LatLng(37.422540, -122.084650),
-//            LatLng(37.422560, -122.084670),
-//            LatLng(37.422580, -122.084690),
-//            LatLng(37.422600, -122.084710),
-//            LatLng(37.422610, -122.084700), // slight left turn
-//            LatLng(37.422620, -122.084690), // slight left turn
-//            LatLng(37.422640, -122.084670), // slight right turn
-//            LatLng(37.422660, -122.084650), // sharp right turn
-//            LatLng(37.422680, -122.084630), // sharp left turn
-//            LatLng(37.422700, -122.084610), // slight left turn
-//            LatLng(37.422720, -122.084590),
-//            LatLng(37.422740, -122.084570),
-//            LatLng(37.422760, -122.084550),
-//            LatLng(37.422780, -122.084530),
-//            LatLng(37.422800, -122.084510),
-//            LatLng(37.422820, -122.084490),
-//            LatLng(37.422840, -122.084470),
-//            LatLng(37.422860, -122.084450),
-//            LatLng(37.422880, -122.084430),
-//            LatLng(37.422900, -122.084410),
-//            LatLng(37.422920, -122.084390),
-//            LatLng(37.422940, -122.084370),
-//            LatLng(37.422960, -122.084350),
-//            LatLng(37.422980, -122.084330),
-//            LatLng(37.423000, -122.084310),
-//            LatLng(37.423020, -122.084290),
-//            LatLng(37.423040, -122.084270),
-//            LatLng(37.423060, -122.084250), // slight left turn
-//            LatLng(37.423080, -122.084230), // slight right turn
-//            LatLng(37.423100, -122.084210),
-//            LatLng(37.423120, -122.084190),
-//        )
-//
-        for (item in recordedTrajectory) {
-            val point = GeoPoint(item.first, item.second)
-            path.addPoint(point)
+        val dummy = listOf(
+            GeoPoint(28.519866666666665, 77.21405833333333),
+            GeoPoint(28.519899, 77.214297),
+            GeoPoint(28.519936, 77.214478),
+            GeoPoint(28.519996, 77.214717),
+            GeoPoint(28.520074, 77.214964),
+            GeoPoint(28.520151, 77.215216),
+            GeoPoint(28.520231, 77.215461),
+            GeoPoint(28.520315, 77.215703),
+            GeoPoint(28.520397, 77.215948),
+            GeoPoint(28.520473, 77.216193),
+            GeoPoint(28.520554, 77.216441),
+            GeoPoint(28.520627, 77.216684),
+            GeoPoint(28.520702, 77.216932),
+            GeoPoint(28.520774, 77.21718),
+            GeoPoint(28.520847, 77.217427),
+            GeoPoint(28.520925, 77.217672),
+            GeoPoint(28.520999, 77.21792),
+            GeoPoint(28.521072, 77.218167),
+            GeoPoint(28.521145, 77.218414),
+            GeoPoint(28.521221, 77.218661),
+            GeoPoint(28.521295, 77.218908),
+            GeoPoint(28.521365, 77.219156),
+            GeoPoint(28.521435, 77.219403),
+            GeoPoint(28.521506, 77.21965),
+            GeoPoint(28.521575, 77.219897),
+            GeoPoint(28.521645, 77.220144),
+            GeoPoint(28.521712, 77.220391),
+            GeoPoint(28.521779, 77.220638),
+            GeoPoint(28.521847, 77.220885),
+            GeoPoint(28.521915, 77.221132),
+            GeoPoint(28.521983, 77.221379),
+            GeoPoint(28.522051, 77.221626),
+            GeoPoint(28.522119, 77.221873),
+            GeoPoint(28.522187, 77.22212),
+            GeoPoint(28.522255, 77.222367),
+            GeoPoint(28.522323, 77.222614),
+            GeoPoint(28.522391, 77.222861),
+            GeoPoint(28.522459, 77.223108),
+            GeoPoint(28.522527, 77.223355),
+            GeoPoint(28.522595, 77.223602),
+            GeoPoint(28.522663, 77.223849),
+            GeoPoint(28.522731, 77.224096),
+            GeoPoint(28.522799, 77.224343),
+            GeoPoint(28.522867, 77.22459),
+            GeoPoint(28.522935, 77.224837),
+            GeoPoint(28.523002, 77.225084),
+            GeoPoint(28.52307, 77.225331),
+            GeoPoint(28.523138, 77.225578),
+            GeoPoint(28.523206, 77.225825),
+        )
+
+        for (item in dummy) {
+            path.addPoint(item)
         }
 
         binding.map.overlays.add(path)
@@ -275,7 +273,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun recordLocation(latitude: Double, longitude: Double) {
-        recordedTrajectory.add(Pair(latitude, longitude))
+        recordedTrajectory.add(GeoPoint(latitude, longitude))
     }
 
     private fun getCurrentLocation() {
@@ -292,19 +290,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
         if (location != null) {
             // If the location is not null, update the UI with the current location
-            val currentMarker = Marker(binding.map)
-            currentMarker.icon = ContextCompat.getDrawable(applicationContext, com.google.android.material.R.drawable.ic_clock_black_24dp)
-            currentMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-            currentMarker.position = GeoPoint(location.latitude, location.longitude)
-            binding.map.overlays.add(currentMarker)
-            binding.map.controller.setCenter(GeoPoint(location.latitude, location.longitude))
+            updateMapUI(location)
+            // code for testing
 //            currentMarker.position = GeoPoint(37.422160, -122.084270)
 //            binding.map.overlays.add(currentMarker)
 //            binding.map.controller.setCenter(GeoPoint(37.422160,-122.084270 ))
-            updateLocationUI(location)
-            recordLocation(location.latitude, location.longitude)
-            updateMapViewWithTrajectory()
-
         } else {
             // If the location is null, request location updates
             val locationRequest = LocationRequest.create().apply {
@@ -317,17 +307,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 override fun onLocationResult(locationResult: LocationResult) {
                     val location = locationResult.lastLocation
                     if (location != null) {
-                        val currentMarker = Marker(binding.map)
-                        currentMarker.icon = ContextCompat.getDrawable(applicationContext, com.google.android.material.R.drawable.mtrl_ic_arrow_drop_up)
-                        currentMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        currentMarker.position = GeoPoint(location.latitude, location.longitude)
-                        binding.map.overlays.add(currentMarker)
-                        binding.map.controller.setCenter(GeoPoint(location.latitude, location.longitude))
-
-                        // Record the user's location in the trajectory recorder
-                        recordLocation(location.latitude, location.longitude)
-                        // Update the map view with the new trajectory
-                        updateMapViewWithTrajectory()
+                        updateMapUI(location)
                     }
                 }
             }
@@ -336,6 +316,21 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
         }
+    }
+
+    private fun updateMapUI(location: Location){
+        val currentMarker = Marker(binding.map)
+        currentMarker.icon = ContextCompat.getDrawable(applicationContext, R.drawable.location)
+//        currentMarker.icon = ContextCompat.getDrawable(applicationContext, android.R.drawable.ic_menu_mylocation)
+        currentMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        currentMarker.position = GeoPoint(location.latitude, location.longitude)
+        binding.map.overlays.add(currentMarker)
+        binding.map.controller.setCenter(currentMarker.position)
+        updateLocationUI(location)
+        // Record the user's location in the trajectory recorder
+        recordLocation(location.latitude, location.longitude)
+        // Update the map view with the new trajectory
+        updateMapViewWithTrajectory()
     }
 
     private fun updateLocationUI(location: Location) {
