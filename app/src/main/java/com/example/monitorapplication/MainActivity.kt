@@ -29,6 +29,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.*
 import android.os.Looper
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
@@ -65,7 +66,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
-        val height = 175
+        val height = 177
         val weight = 80
         strideLength = (0.415 * height.toDouble().pow(1.12) - (weight * 0.036)).toFloat()
 
@@ -77,7 +78,47 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         binding.map.setMultiTouchControls(true)
         binding.map.controller.setZoom(20.0)
 
-        getCurrentLocation()
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Request the permission to access the location if it is not already granted
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 123)
+            return
+        }
+
+        // Get the last known location from the location manager
+        val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+        if (location != null) {
+            // If the location is not null, update the UI with the current location
+            val currentMarker = Marker(binding.map)
+            currentMarker.icon = ContextCompat.getDrawable(applicationContext, R.drawable.location)
+            currentMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            currentMarker.position = GeoPoint(location.latitude, location.longitude)
+            binding.map.overlays.add(currentMarker)
+            binding.map.controller.setCenter(currentMarker.position)
+        }
+        else {
+            // If the location is null, request location updates
+            val locationRequest = LocationRequest.create().apply {
+                priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+                interval = 10000
+                fastestInterval = 5000
+            }
+
+            val locationCallback = object : LocationCallback() {
+                override fun onLocationResult(locationResult: LocationResult) {
+                    val location = locationResult.lastLocation
+                    if (location != null) {
+                        updateMapUI(location)
+                    }
+                }
+            }
+
+            // Request location updates
+            val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+            fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
+        }
 
     }
 
@@ -116,22 +157,17 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 )
 
                 //comment here
-                if (accelerationMagnitude > 1) {
+                if (accelerationMagnitude > 1 && accelerationMagnitude < 3) {
                     stepCount++
                     distance += strideLength / 2
 
                     getCurrentLocation()
                 }
 
-                if (linearAcceleration[2] > liftThreshold) {
+                if (linearAcceleration[2] > liftThreshold && linearAcceleration[2] < stairsThreshold) {
                     isOnLift = true
-                    isOnStairs = false
                 } else if (linearAcceleration[2] > stairsThreshold) {
                     isOnStairs = true
-                    isOnLift = false
-                } else {
-                    isOnStairs = false
-                    isOnLift = false
                 }
 
                 // updating the UI with step count
@@ -140,9 +176,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 binding.tvDistance.text = "Distance: $distance m"
 
                 if(isOnLift){
+                    Toast.makeText(this, "Lift", Toast.LENGTH_SHORT)
                     binding.tvLiftOrStairs.text = "Lift"
                 }
                 if(isOnStairs){
+                    Toast.makeText(this, "Stairs", Toast.LENGTH_SHORT)
                     binding.tvLiftOrStairs.text = "Stairs"
                 }
 
@@ -313,6 +351,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun updateMapUI(location: Location){
+        binding.map.overlays.add(null)
         val currentMarker = Marker(binding.map)
         currentMarker.icon = ContextCompat.getDrawable(applicationContext, R.drawable.location)
         currentMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
