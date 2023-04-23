@@ -292,9 +292,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             // If the location is not null, update the UI with the current location
             updateMapUI(location)
             // code for testing
-//            currentMarker.position = GeoPoint(37.422160, -122.084270)
-//            binding.map.overlays.add(currentMarker)
-//            binding.map.controller.setCenter(GeoPoint(37.422160,-122.084270 ))
         } else {
             // If the location is null, request location updates
             val locationRequest = LocationRequest.create().apply {
