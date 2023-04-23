@@ -332,9 +332,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private fun updateLocationUI(location: Location) {
         // Update the UI with the current location
         Log.d("LOCATION", "Current location: ${location.latitude}, ${location.longitude}")
-        // You can use the location object to perform your desired functionality here
     }
-
 
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
