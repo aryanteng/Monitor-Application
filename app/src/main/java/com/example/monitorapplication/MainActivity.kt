@@ -321,7 +321,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private fun updateMapUI(location: Location){
         val currentMarker = Marker(binding.map)
         currentMarker.icon = ContextCompat.getDrawable(applicationContext, R.drawable.location)
-//        currentMarker.icon = ContextCompat.getDrawable(applicationContext, android.R.drawable.ic_menu_mylocation)
         currentMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         currentMarker.position = GeoPoint(location.latitude, location.longitude)
         binding.map.overlays.add(currentMarker)
