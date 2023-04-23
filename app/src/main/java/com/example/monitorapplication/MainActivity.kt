@@ -30,8 +30,6 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.*
 import android.os.Looper
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.maps.model.LatLng
-
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var binding: ActivityMainBinding
