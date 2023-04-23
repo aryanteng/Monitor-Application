@@ -64,9 +64,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
-        val height = 1.77
+        val height = 177
         val weight = 80
-        strideLength = (0.415 * height.pow(1.12) - (weight * 0.036)).toFloat()
+        strideLength = ((0.415 * height.toDouble().pow(1.12) - (weight * 0.036))/100).toFloat()
 
 
         Configuration.getInstance().userAgentValue = packageName
@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 )
 
                 //comment here
-                if (accelerationMagnitude > 0.8 && accelerationMagnitude < 1.5) {
+                if (accelerationMagnitude > 0.9 && accelerationMagnitude < 1.5) {
                     stepCount++
                     distance += strideLength / 2
 
