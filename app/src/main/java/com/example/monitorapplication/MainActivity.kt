@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 )
 
                 //comment here
-                if (accelerationMagnitude > 1 && accelerationMagnitude < 3) {
+                if (accelerationMagnitude > 1 && accelerationMagnitude < 2.5) {
                     stepCount++
                     distance += strideLength / 2
 
@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 // updating the UI with step count
                 binding.tvStepCount.text = "Steps: $stepCount"
                 // updating the UI with distance
-                binding.tvDistance.text = "Distance: $distance m"
+                binding.tvDistance.text = "Distance: $distance cm"
 
                 if(isOnLift){
                     Toast.makeText(this, "Lift", Toast.LENGTH_SHORT)
@@ -311,7 +311,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun updateMapUI(location: Location){
-        binding.map.overlays.add(null)
         val currentMarker = Marker(binding.map)
         currentMarker.icon = ContextCompat.getDrawable(applicationContext, R.drawable.location)
         currentMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
