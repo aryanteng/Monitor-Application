@@ -72,7 +72,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         Configuration.getInstance().userAgentValue = packageName
 
         binding.map.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
-        binding.map.setBuiltInZoomControls(true)
         binding.map.setMultiTouchControls(true)
         binding.map.controller.setZoom(20.0)
 
@@ -97,9 +96,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 //comment here
                 val alpha = 0.08f
                 val gravity = FloatArray(3)
-                gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
-                gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
-                gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
+                gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0]
+                gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1]
+                gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2]
 
                 //comment here
                 val linearAcceleration = FloatArray(3)
@@ -136,11 +135,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 binding.tvDistance.text = "Distance: $distance m"
 
                 if(isOnLift){
-                    Toast.makeText(this, "Lift", Toast.LENGTH_SHORT)
+                    Toast.makeText(this, "Lift", Toast.LENGTH_SHORT).show()
                     binding.tvLiftOrStairs.text = "Lift"
                 }
                 if(isOnStairs){
-                    Toast.makeText(this, "Stairs", Toast.LENGTH_SHORT)
+                    Toast.makeText(this, "Stairs", Toast.LENGTH_SHORT).show()
                     binding.tvLiftOrStairs.text = "Stairs"
                 }
 
