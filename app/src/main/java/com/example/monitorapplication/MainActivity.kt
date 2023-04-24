@@ -60,23 +60,26 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val view = binding.root
         setContentView(view)
 
+        // initialising sensors
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
+        // stride length calculation
         val height = 177
         val weight = 80
         strideLength = ((0.415 * height.toDouble().pow(1.12) - (weight * 0.036))/100).toFloat()
 
-
+        // initialising map
         Configuration.getInstance().userAgentValue = packageName
-
         binding.map.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
         binding.map.setMultiTouchControls(true)
         binding.map.controller.setZoom(20.0)
 
+        // clearing the recorded trajectory
         recordedTrajectory.clear()
 
+        // calling for location
         getCurrentLocation()
 
     }
@@ -95,20 +98,20 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent) {
         when (event.sensor.type){
             Sensor.TYPE_ACCELEROMETER -> {
-                //comment here
+                // a low pass filter to smooth out the accelerometer readings and to remove the contribution of gravity
                 val alpha = 0.08f
                 val gravity = FloatArray(3)
                 gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0]
                 gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1]
                 gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2]
 
-                //comment here
+                // removing gravity component from the accelerometer readings
                 val linearAcceleration = FloatArray(3)
                 linearAcceleration[0] = event.values[0] - gravity[0]
                 linearAcceleration[1] = event.values[1] - gravity[1]
                 linearAcceleration[2] = event.values[2] - gravity[2]
 
-                // Compute the acceleration magnitude
+                // calculating the magnitude of acceleration
                 val accelerationMagnitude = sqrt(
                     linearAcceleration[0].toDouble().pow(2.0) +
                             linearAcceleration[1].toDouble().pow(2.0) +
@@ -117,7 +120,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
                 binding.tvLiftOrStairs.text = "Magnitude: $accelerationMagnitude"
 
-                //comment here
+                // threshold for detecting steps
                 if (accelerationMagnitude > 1.1 && accelerationMagnitude < 1.4) {
                     stepCount++
                     distance += strideLength / 2
@@ -167,14 +170,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 }
             }
             Sensor.TYPE_MAGNETIC_FIELD -> {
-                // comment here
+                // storing the magnetometer sensor readings in a list to use it in accelerometer
                 lastMagnetometer = event.values
             }
         }
     }
 
     private fun calculateDirection(azimuth: Double): String {
-        // comment here
+        // generic function for calculating the direction using azimuth angle
         var direction = ""
         if (azimuth >= -22.5 && azimuth < 22.5) {
             direction = "North"
@@ -184,14 +187,16 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             direction = "East"
         } else if (azimuth >= 112.5 && azimuth < 157.5) {
             direction = "Southeast"
-        } else if (azimuth >= 157.5 || azimuth < -157.5) {
-            direction = "South"
-        } else if (azimuth >= -157.5 && azimuth < -112.5) {
-            direction = "Southwest"
-        } else if (azimuth >= -112.5 && azimuth< -67.5) {
+        }
+        else if (azimuth >= -112.5 && azimuth< -67.5) {
             direction = "West"
         } else if (azimuth >= -67.5 && azimuth < -22.5) {
             direction = "Northwest"
+        }
+        else if (azimuth >= 157.5 || azimuth < -157.5) {
+            direction = "South"
+        } else if (azimuth >= -157.5 && azimuth < -112.5) {
+            direction = "Southwest"
         }
         return direction
     }
@@ -204,11 +209,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         path.outlinePaint.strokeWidth = 7.0f
         path.outlinePaint.strokeCap = Paint.Cap.ROUND
 
+        // making the path dashed
         val dashInterval = 20.0f
         val gapInterval = 50.0f
         val effect = DashPathEffect(floatArrayOf(dashInterval, gapInterval), 0.0f)
         path.outlinePaint.pathEffect = effect
 
+        // dummy list of coordinates for testing polyline
         val dummy = listOf(
             GeoPoint(28.519866666666665, 77.21405833333333),
             GeoPoint(28.519899, 77.214297),
@@ -275,14 +282,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private fun getCurrentLocation() {
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
             ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Request the permission to access the location if it is not already granted
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 123)
             return
         }
-
         // Get the last known location from the location manager
         val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
         if (location != null) {
@@ -295,7 +300,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 interval = 10000
                 fastestInterval = 5000
             }
-
             val locationCallback = object : LocationCallback() {
                 override fun onLocationResult(locationResult: LocationResult) {
                     val location = locationResult.lastLocation
@@ -304,7 +308,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     }
                 }
             }
-
             // Request location updates
             val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
@@ -329,7 +332,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         // Update the UI with the current location
         Log.d("LOCATION", "Current location: ${location.latitude}, ${location.longitude}")
     }
-
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
         // mandatory hook for sensor event listener
