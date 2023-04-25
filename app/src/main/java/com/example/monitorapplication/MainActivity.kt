@@ -169,10 +169,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     val orientation = FloatArray(3)
                     SensorManager.getOrientation(rotationMatrix, orientation)
 
-                    // Convert the orientation angles from radians to degrees
+                    // converting orientation angle from radian to degrees
                     val azimuth = Math.toDegrees(orientation[0].toDouble())
 
-                    // Compute the direction of movement
+                    // calculating the direction from the azimuth
                     val direction = calculateDirection(azimuth)
 
                     // updating the UI with the direction
