@@ -181,21 +181,26 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         var direction = ""
         if (azimuth >= -22.5 && azimuth < 22.5) {
             direction = "North"
-        } else if (azimuth >= 22.5 && azimuth < 67.5) {
+        }
+        else if (azimuth >= 22.5 && azimuth < 67.5) {
             direction = "Northeast"
-        } else if (azimuth >= 67.5 && azimuth < 112.5) {
+        }
+        else if (azimuth >= 67.5 && azimuth < 112.5) {
             direction = "East"
-        } else if (azimuth >= 112.5 && azimuth < 157.5) {
+        }
+        else if (azimuth >= 112.5 && azimuth < 157.5) {
             direction = "Southeast"
         }
         else if (azimuth >= -112.5 && azimuth< -67.5) {
             direction = "West"
-        } else if (azimuth >= -67.5 && azimuth < -22.5) {
+        }
+        else if (azimuth >= -67.5 && azimuth < -22.5) {
             direction = "Northwest"
         }
         else if (azimuth >= 157.5 || azimuth < -157.5) {
             direction = "South"
-        } else if (azimuth >= -157.5 && azimuth < -112.5) {
+        }
+        else if (azimuth >= -157.5 && azimuth < -112.5) {
             direction = "Southwest"
         }
         return direction
