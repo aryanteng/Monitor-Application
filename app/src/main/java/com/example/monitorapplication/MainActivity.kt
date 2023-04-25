@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var accelerometer: Sensor
     private lateinit var magnetometer: Sensor
 
-    private var lastMagnetometer = FloatArray(3)
+    private var magnetometerValues = FloatArray(3)
     private var stepCount = 0
     private var distance = 0.0
 
@@ -148,12 +148,22 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 //                    binding.tvLiftOrStairs.text = "Stairs"
                 }
 
-                if (lastMagnetometer.isNotEmpty()) {
+                if (magnetometerValues.isNotEmpty()) {
+                    val magnetometerMagnitude = sqrt(
+                        magnetometerValues[0].toDouble().pow(2) +
+                                magnetometerValues[1].toDouble().pow(2) +
+                                magnetometerValues[2].toDouble().pow(2)
+                    ).toFloat()
+
+                    if(magnetometerMagnitude < 5){
+                        Toast.makeText(this, "Lift", Toast.LENGTH_SHORT).show()
+                    }
+
                     val rotationMatrix = FloatArray(9)
                     val inclinationMatrix = FloatArray(9)
 
                     // Compute the rotation matrix and inclination matrix
-                    SensorManager.getRotationMatrix(rotationMatrix, inclinationMatrix, gravity, lastMagnetometer)
+                    SensorManager.getRotationMatrix(rotationMatrix, inclinationMatrix, gravity, magnetometerValues)
 
                     // Get the orientation angles from the rotation matrix
                     val orientation = FloatArray(3)
@@ -171,7 +181,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             }
             Sensor.TYPE_MAGNETIC_FIELD -> {
                 // storing the magnetometer sensor readings in a list to use it in accelerometer
-                lastMagnetometer = event.values
+                magnetometerValues = event.values
             }
         }
     }
