@@ -33,26 +33,34 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
+    // defining binding
     private lateinit var binding: ActivityMainBinding
 
+    // defining sensors
     private lateinit var sensorManager: SensorManager
     private lateinit var accelerometer: Sensor
     private lateinit var magnetometer: Sensor
 
+    // defining variable for storing magnetometer values
     private var magnetometerValues = FloatArray(3)
+
+    // defining variable for step count
     private var stepCount = 0
+
+    // defining variables for distance
     private var distance = 0.0
 
+    // defining variables for lift and stairs
     private var liftThreshold: Float = 1.5f
     private var stairsThreshold: Float = 2.5f
     private var isOnStairs: Boolean = false
     private var isOnLift: Boolean = false
 
-
+    // defining variable for stride length
     private var strideLength = 0f
 
+    // defining variable for storing recorded geopoints
     private val recordedTrajectory = mutableListOf<GeoPoint>()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
