@@ -123,8 +123,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 // threshold for detecting steps
                 if (accelerationMagnitude > 1 && accelerationMagnitude < 1.4) {
                     stepCount++
+                    // stride length is distance covered in 2 steps so after one step it should be half the stride length
                     distance += strideLength / 2
 
+                    // calling the current location hook
                     getCurrentLocation()
                 }
 
@@ -162,10 +164,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     val rotationMatrix = FloatArray(9)
                     val inclinationMatrix = FloatArray(9)
 
-                    // Compute the rotation matrix and inclination matrix
+                    // Get rotation matrix from inclination matrix, gravity and magnetometer values
                     SensorManager.getRotationMatrix(rotationMatrix, inclinationMatrix, gravity, magnetometerValues)
 
-                    // Get the orientation angles from the rotation matrix
+                    // From the rotation matrix we extract orientation angles
                     val orientation = FloatArray(3)
                     SensorManager.getOrientation(rotationMatrix, orientation)
 
