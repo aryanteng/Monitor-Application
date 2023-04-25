@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 binding.tvLiftOrStairs.text = "Magnitude: $accelerationMagnitude"
 
                 // threshold for detecting steps
-                if (accelerationMagnitude > 1.1 && accelerationMagnitude < 1.4) {
+                if (accelerationMagnitude > 1 && accelerationMagnitude < 1.4) {
                     stepCount++
                     distance += strideLength / 2
 
