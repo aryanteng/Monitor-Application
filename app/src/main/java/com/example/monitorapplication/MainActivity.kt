@@ -112,15 +112,15 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 // a low pass filter to smooth out the accelerometer readings and to remove the contribution of gravity
                 val alpha = 0.08f
                 val gravity = FloatArray(3)
-                gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0]
-                gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1]
-                gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2]
+                for (i in gravity.indices){
+                    gravity[i] = alpha * gravity[i] + (1 - alpha) * event.values[i]
+                }
 
                 // removing gravity component from the accelerometer readings
                 val linearAcceleration = FloatArray(3)
-                linearAcceleration[0] = event.values[0] - gravity[0]
-                linearAcceleration[1] = event.values[1] - gravity[1]
-                linearAcceleration[2] = event.values[2] - gravity[2]
+                for (i in linearAcceleration.indices){
+                    linearAcceleration[i] = event.values[i] - gravity[i]
+                }
 
                 // calculating the magnitude of acceleration
                 val accelerationMagnitude = sqrt(
