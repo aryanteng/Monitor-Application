@@ -44,6 +44,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     // defining variable for storing magnetometer values
     private var magnetometerValues = FloatArray(3)
 
+    private var gravity = FloatArray(3)
+    private var linearAcceleration = FloatArray(3)
+
     // defining variable for step count
     private var stepCount = 0
 
@@ -149,14 +152,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 // updating the UI with distance
                 binding.tvDistance.text = "Distance: $distance m"
 
-                if(isOnLift){
-                    Toast.makeText(this, "Lift", Toast.LENGTH_SHORT).show()
+//                if(isOnLift){
+//                    Toast.makeText(this, "Lift", Toast.LENGTH_SHORT).show()
 //                    binding.tvLiftOrStairs.text = "Lift"
-                }
-                if(isOnStairs){
-                    Toast.makeText(this, "Stairs", Toast.LENGTH_SHORT).show()
+//                }
+//                if(isOnStairs){
+//                    Toast.makeText(this, "Stairs", Toast.LENGTH_SHORT).show()
 //                    binding.tvLiftOrStairs.text = "Stairs"
-                }
+//                }
 
                 if (magnetometerValues.isNotEmpty()) {
                     val magnetometerMagnitude = sqrt(
