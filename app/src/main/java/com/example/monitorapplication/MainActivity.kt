@@ -133,6 +133,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
                 // threshold for detecting steps
                 if (isStep(accelerationMagnitude = accelerationMagnitude)) {
+                    // increment step count
                     stepCount++
                     // stride length is distance covered in 2 steps so after one step it should be half the stride length
                     distance += strideLength / 2
