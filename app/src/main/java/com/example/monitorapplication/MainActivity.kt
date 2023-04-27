@@ -31,6 +31,7 @@ import com.google.android.gms.location.*
 import android.os.Looper
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import kotlin.math.abs
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
     // defining binding
@@ -165,7 +166,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 if (magnetometerValues.isNotEmpty()) {
                     val magnetometerMagnitude = calculateMagnitude(magnetometerValues)
 
-                    if(magnetometerMagnitude < 5){
+                    if(abs(magnetometerMagnitude - SensorManager.MAGNETIC_FIELD_EARTH_MAX) < 30.0f){
                         Toast.makeText(this, "Lift", Toast.LENGTH_SHORT).show()
                     }
 
