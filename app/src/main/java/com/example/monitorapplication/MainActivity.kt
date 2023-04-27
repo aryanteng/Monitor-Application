@@ -215,6 +215,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         // Check if the acceleration magnitude is greater than the moving average multiplied by the threshold factor
         if (accelerationMagnitude > movingAverage * peakThresholdFactor && currentTimestamp - lastStepTime > stepDebounceTime) {
             lastStepTime = currentTimestamp
+            Log.i("LIST", accelerationMagnitudeList.toString())
+            Log.i("AVERAGE", movingAverage.toString())
             return true
         }
 
