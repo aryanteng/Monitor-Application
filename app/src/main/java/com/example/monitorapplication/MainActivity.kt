@@ -46,6 +46,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private var gravity = FloatArray(3)
     private var linearAcceleration = FloatArray(3)
+    private var accelerationMagnitudeList : MutableList<Double> = mutableListOf()
 
     // defining variable for step count
     private var stepCount = 0
@@ -64,6 +65,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     // defining variable for storing recorded geopoints
     private val recordedTrajectory = mutableListOf<GeoPoint>()
+
+    // Debounce mechanism to prevent multiple steps from being detected in quick succession
+    private var lastStepTime: Long = 0
+    private val stepDebounceTime = 250 // milliseconds
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,29 +116,23 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         when (event.sensor.type){
             Sensor.TYPE_ACCELEROMETER -> {
                 // a low pass filter to smooth out the accelerometer readings and to remove the contribution of gravity
-                val alpha = 0.08f
-                val gravity = FloatArray(3)
+                val alpha = 0.8f
                 for (i in gravity.indices){
                     gravity[i] = alpha * gravity[i] + (1 - alpha) * event.values[i]
                 }
 
                 // removing gravity component from the accelerometer readings
-                val linearAcceleration = FloatArray(3)
                 for (i in linearAcceleration.indices){
                     linearAcceleration[i] = event.values[i] - gravity[i]
                 }
 
                 // calculating the magnitude of acceleration
-                val accelerationMagnitude = sqrt(
-                    linearAcceleration[0].toDouble().pow(2.0) +
-                            linearAcceleration[1].toDouble().pow(2.0) +
-                            linearAcceleration[2].toDouble().pow(2.0)
-                )
+                val accelerationMagnitude = calculateMagnitude(linearAcceleration)
 
                 binding.tvLiftOrStairs.text = "Magnitude: $accelerationMagnitude"
 
                 // threshold for detecting steps
-                if (accelerationMagnitude > 1 && accelerationMagnitude < 1.4) {
+                if (isStep(accelerationMagnitude = accelerationMagnitude)) {
                     stepCount++
                     // stride length is distance covered in 2 steps so after one step it should be half the stride length
                     distance += strideLength / 2
@@ -162,11 +162,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 //                }
 
                 if (magnetometerValues.isNotEmpty()) {
-                    val magnetometerMagnitude = sqrt(
-                        magnetometerValues[0].toDouble().pow(2) +
-                                magnetometerValues[1].toDouble().pow(2) +
-                                magnetometerValues[2].toDouble().pow(2)
-                    ).toFloat()
+                    val magnetometerMagnitude = calculateMagnitude(magnetometerValues)
 
                     if(magnetometerMagnitude < 5){
                         Toast.makeText(this, "Lift", Toast.LENGTH_SHORT).show()
@@ -197,6 +193,39 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 magnetometerValues = event.values
             }
         }
+    }
+
+    private fun isStep(accelerationMagnitude: Double): Boolean {
+        val movingAverageWindowSize = 5
+        val peakThresholdFactor = 1.3
+        val currentTimestamp = System.currentTimeMillis()
+
+        // Add the current acceleration magnitude to the list
+        accelerationMagnitudeList.add(accelerationMagnitude)
+
+        // Remove the oldest data point if the list size exceeds the window size
+        if (accelerationMagnitudeList.size > movingAverageWindowSize) {
+            accelerationMagnitudeList.removeAt(0)
+        }
+
+        // Calculate the moving average
+        val movingAverage = accelerationMagnitudeList.average()
+
+        // Check if the acceleration magnitude is greater than the moving average multiplied by the threshold factor
+        if (accelerationMagnitude > movingAverage * peakThresholdFactor && currentTimestamp - lastStepTime > stepDebounceTime) {
+            lastStepTime = currentTimestamp
+            return true
+        }
+
+        return false
+    }
+
+    private fun calculateMagnitude(array: FloatArray): Double {
+        return sqrt(
+            array[0].toDouble().pow(2) +
+                    array[1].toDouble().pow(2) +
+                    array[2].toDouble().pow(2)
+        )
     }
 
     private fun calculateDirection(azimuth: Double): String {
