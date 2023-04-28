@@ -198,7 +198,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun isStep(accelerationMagnitude: Double): Boolean {
-        val movingAverageWindowSize = 5
+        val movingAverageWindowSize = 7
         val peakThresholdFactor = 1.5
         val currentTimestamp = System.currentTimeMillis()
 
