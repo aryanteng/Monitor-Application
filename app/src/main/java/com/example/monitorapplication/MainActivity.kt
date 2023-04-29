@@ -128,11 +128,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     linearAcceleration[i] = event.values[i] - gravity[i]
                 }
 
-
                 // calculating the magnitude of acceleration
                 val accelerationMagnitude = calculateMagnitude(linearAcceleration)
 
-                binding.tvLiftOrStairs.text = "Magnitude: $accelerationMagnitude"
+//                binding.tvLiftOrStairs.text = "Magnitude: $accelerationMagnitude"
 
                 // threshold for detecting steps
                 if (isStep(accelerationMagnitude = accelerationMagnitude)) {
@@ -146,13 +145,17 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 }
 
                 if(isStairs(zAxisMagnitude = linearAcceleration[2])){
-                    binding.tvLiftOrStairs.text = "Stairs"
+                    binding.tvStairs.text = "Stairs"
                 }
 
-                if (linearAcceleration[2] > liftThreshold && linearAcceleration[2] < stairsThreshold) {
-                    isOnLift = true
-                } else if (linearAcceleration[2] > stairsThreshold) {
-                    isOnStairs = true
+                if (magnetometerValues.isNotEmpty()) {
+                    val magnetometerMagnitude = calculateMagnitude(magnetometerValues)
+                    if(isLift(zAxisMagnitude = linearAcceleration[2], magnetometerMagnitude = magnetometerMagnitude)){
+                        binding.tvStairs.text = "Lift"
+                    }
+                    else{
+                        binding.tvStairs.text = ""
+                    }
                 }
 
                 // updating the UI with step count
@@ -170,12 +173,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 //                }
 
                 if (magnetometerValues.isNotEmpty()) {
-                    val magnetometerMagnitude = calculateMagnitude(magnetometerValues)
-
-//                    if(abs(magnetometerMagnitude - SensorManager.MAGNETIC_FIELD_EARTH_MAX) < 30.0f){
-//                        Toast.makeText(this, "Lift", Toast.LENGTH_SHORT).show()
-//                    }
-
                     val rotationMatrix = FloatArray(9)
                     val inclinationMatrix = FloatArray(9)
 
@@ -203,9 +200,35 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
+    private fun isLift(zAxisMagnitude: Float, magnetometerMagnitude: Double): Boolean{
+        val slidingWindowSize = 3
+        val liftThreshold = 2
+        val magnitudeThreshold = 20.0f
+
+        binding.tvMag.text = "$magnetometerMagnitude"
+
+        // Add the current acceleration magnitude to the list
+        zAxisMagnitudeList.add(zAxisMagnitude)
+
+        // Remove the oldest data point if the list size exceeds the window size
+        if (zAxisMagnitudeList.size > slidingWindowSize) {
+            zAxisMagnitudeList.removeAt(0)
+        }
+
+        // Calculate the moving average
+        val movingAverage = zAxisMagnitudeList.average()
+
+        // Check if the acceleration magnitude is greater than the moving average plus the threshold factor
+        if (magnetometerMagnitude < magnitudeThreshold) {
+            return true
+        }
+
+        return false
+    }
+
     private fun isStairs(zAxisMagnitude: Float): Boolean{
         val slidingWindowSize = 10
-        val stairsThreshold = 4.25
+        val stairsThreshold = 4.5
 
         // Add the current acceleration magnitude to the list
         zAxisMagnitudeList.add(zAxisMagnitude)
