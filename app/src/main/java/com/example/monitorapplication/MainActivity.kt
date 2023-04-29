@@ -146,15 +146,19 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
                 if(isStairs(zAxisMagnitude = linearAcceleration[2])){
                     binding.tvStairs.text = "Stairs"
+                    Toast.makeText(this, "Stairs", Toast.LENGTH_LONG).show()
+                }
+                else{
+                    binding.tvStairs.text = ""
                 }
 
                 if (magnetometerValues.isNotEmpty()) {
                     val magnetometerMagnitude = calculateMagnitude(magnetometerValues)
                     if(isLift(zAxisMagnitude = linearAcceleration[2], magnetometerMagnitude = magnetometerMagnitude)){
-                        binding.tvStairs.text = "Lift"
+                        binding.tvLift.text = "Lift"
                     }
                     else{
-                        binding.tvStairs.text = ""
+                        binding.tvLift.text = ""
                     }
                 }
 
@@ -162,15 +166,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 binding.tvStepCount.text = "Steps: $stepCount"
                 // updating the UI with distance
                 binding.tvDistance.text = "Distance: $distance m"
-
-//                if(isOnLift){
-//                    Toast.makeText(this, "Lift", Toast.LENGTH_SHORT).show()
-//                    binding.tvLiftOrStairs.text = "Lift"
-//                }
-//                if(isOnStairs){
-//                    Toast.makeText(this, "Stairs", Toast.LENGTH_SHORT).show()
-//                    binding.tvLiftOrStairs.text = "Stairs"
-//                }
 
                 if (magnetometerValues.isNotEmpty()) {
                     val rotationMatrix = FloatArray(9)
@@ -203,7 +198,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private fun isLift(zAxisMagnitude: Float, magnetometerMagnitude: Double): Boolean{
         val slidingWindowSize = 3
         val liftThreshold = 2
-        val magnitudeThreshold = 20.0f
+        val magnitudeThreshold = 23.0f
 
         binding.tvMag.text = "$magnetometerMagnitude"
 
@@ -228,7 +223,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private fun isStairs(zAxisMagnitude: Float): Boolean{
         val slidingWindowSize = 10
-        val stairsThreshold = 4.5
+        val stairsThreshold = 4.25
 
         // Add the current acceleration magnitude to the list
         zAxisMagnitudeList.add(zAxisMagnitude)
