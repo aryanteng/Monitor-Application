@@ -112,8 +112,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         // calling for location
         getCurrentLocation()
 
-        binding.trajectoryView.setBackgroundColor(Color.CYAN)
-
     }
 
     override fun onResume() {
@@ -267,7 +265,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private fun isStairs(zAxisMagnitude: Float): Boolean{
         val slidingWindowSize = 10
-        val stairsThreshold = 4.5
+        val stairsThreshold = 5
 
         // Add the current acceleration magnitude to the list
         zAxisMagnitudeList.add(zAxisMagnitude)
