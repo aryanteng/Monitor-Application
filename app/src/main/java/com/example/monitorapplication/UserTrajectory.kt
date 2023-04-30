@@ -9,13 +9,13 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 
-class TrajectoryView @JvmOverloads constructor(
+class UserTrajectory @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
     private val paint = Paint().apply {
         color = Color.BLACK
-        strokeWidth = 200f
+        strokeWidth = 50f
         isAntiAlias = true
         style = Paint.Style.STROKE
     }
@@ -24,11 +24,7 @@ class TrajectoryView @JvmOverloads constructor(
 
     fun addPoint(x: Float, y: Float) {
         Log.i("ADD POINT", "$x,$y")
-        if (path.isEmpty) {
-            path.moveTo(x - width / 2f, y - height / 2f)
-        } else {
-            path.lineTo(x - width / 2f, y - height / 2f)
-        }
+        path.lineTo(x, y)
         requestLayout()
         invalidate()
     }

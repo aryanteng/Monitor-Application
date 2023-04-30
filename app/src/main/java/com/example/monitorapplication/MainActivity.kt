@@ -157,8 +157,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     xValues.add(currX)
                     yValues.add(currY)
 
-                    binding.trajectoryView.addPoint(currX, currY)
-                    binding.trajectoryView.invalidate()
+                    binding.userTrajectory.addPoint(currX, currY)
+                    binding.userTrajectory.invalidate()
 
                     // update the previous coordinates with the current coordinates
                     previousX = currX
@@ -189,7 +189,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 // updating the UI with step count
                 binding.tvStepCount.text = "Steps: $stepCount"
                 // updating the UI with distance
-                binding.tvDistance.text = "Distance: $distance m"
+                binding.tvDistance.text = "Distance: ${distance.toFloat()} m"
 
                 if (magnetometerValues.isNotEmpty()) {
                     val rotationMatrix = FloatArray(9)
