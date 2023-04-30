@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.RectF
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
@@ -15,29 +16,35 @@ class UserTrajectory @JvmOverloads constructor(
 
     private val paint = Paint().apply {
         color = Color.BLACK
-        strokeWidth = 10f
+        strokeWidth = 5f
         isAntiAlias = true
         style = Paint.Style.STROKE
     }
 
+
     private val path = Path()
+    private val trajectoryBounds = RectF()
 
     fun addPoint(x: Float, y: Float) {
         Log.i("ADD POINT", "$x,$y")
         path.lineTo(x, y)
+        trajectoryBounds.union(x, y)
         requestLayout()
         invalidate()
     }
 
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        val scale = minOf(
-            (width - paddingLeft - paddingRight) / width,
-            (height - paddingTop - paddingBottom) / height
-        ) * 1.2f
-        canvas.translate(paddingLeft.toFloat(), paddingTop.toFloat())
+        val trajectoryBounds = RectF()
+        path.computeBounds(trajectoryBounds, true)
+        val canvasWidth = width - paddingLeft - paddingRight
+        val canvasHeight = height - paddingTop - paddingBottom
+        val centerX = canvasWidth / 2f
+        val centerY = canvasHeight / 2f
+        val scale = 5f // Adjust the scaling factor here
+        canvas.translate(centerX, centerY)
         canvas.scale(scale, scale)
-        canvas.translate(width / 2f, height / 2f)
         canvas.drawPath(path, paint)
     }
 
