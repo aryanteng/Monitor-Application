@@ -22,7 +22,6 @@ import android.Manifest
 import android.graphics.Color
 import android.graphics.DashPathEffect
 import android.graphics.Paint
-import android.graphics.Path
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -165,6 +164,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     previousX = currX
                     previousY = currY
 
+                    Log.i("DISPLACEMENT", "${sqrt(previousX.pow(2) + previousY.pow(2))}")
+
                 }
 
                 if(isStairs(zAxisMagnitude = linearAcceleration[2])){
@@ -219,28 +220,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 magnetometerValues = event.values
             }
         }
-    }
-
-    private fun drawPath() {
-        Log.d("TAG", "Drawing path: ($previousX, $previousY) -> ($currX, $currY)")
-        // Create a path from the previous coordinates to the current coordinates
-        val path = Path()
-        path.moveTo(previousX, previousY)
-        path.lineTo(currX, currY)
-
-        // Set the paint style and color
-        val paint = Paint()
-        paint.color = Color.RED
-        paint.strokeWidth = 15f
-        paint.isAntiAlias = true
-
-        // Draw the path on the com.example.monitorapplication.TrajectoryView canvas
-        binding.trajectoryView.addPoint(currX, currY)
-        binding.trajectoryView.invalidate()
-
-        // Update the last coordinates
-        previousX = currX
-        previousY = currY
     }
 
     private fun isLift(magnetometerMagnitude: Double): Boolean{
