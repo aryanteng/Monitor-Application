@@ -139,6 +139,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 // calculating the magnitude of acceleration
                 val accelerationMagnitude = calculateMagnitude(linearAcceleration)
 
+                binding.tvAccelerometer.text = "Accelerometer: ${accelerationMagnitude.toFloat()}"
+
                 // threshold for detecting steps
                 if (isStep(accelerationMagnitude = accelerationMagnitude)) {
                     // increment step count
@@ -173,23 +175,19 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 }
 
                 if(isStairs(zAxisMagnitude = linearAcceleration[2])){
-                    binding.tvStairs.text = "Stairs"
                     val currentTime = System.currentTimeMillis()
-                    if(currentTime - lastStairsToastTime > stairsToastDebounceTime){
+                    if (currentTime - lastStairsToastTime > stairsToastDebounceTime){
                         Toast.makeText(this, "Stairs", Toast.LENGTH_SHORT).show()
                         lastStairsToastTime = currentTime
                     }
                 }
-                else{
-                    binding.tvStairs.text = ""
-                }
 
                 if (magnetometerValues.isNotEmpty()) {
                     val magnetometerMagnitude = calculateMagnitude(magnetometerValues)
-                    if(isLift(magnetometerMagnitude = magnetometerMagnitude)){
+                    if (isLift(magnetometerMagnitude = magnetometerMagnitude)){
                         binding.tvLift.text = "Lift"
                     }
-                    else{
+                    else {
                         binding.tvLift.text = ""
                     }
                 }
@@ -232,7 +230,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private fun isLift(magnetometerMagnitude: Double): Boolean{
         val magnitudeThreshold = 22.0f
 
-//        binding.tvMag.text = "$magnetometerMagnitude"
+        binding.tvMagnetometer.text = "Magnetometer: ${magnetometerMagnitude.toFloat()}"
 
         // Check if the magnetometer magnitude is lesser than threshold
         if (magnetometerMagnitude < magnitudeThreshold) {
