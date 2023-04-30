@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         // stride length calculation
         val height = 177
-        val weight = 80
+        val weight = 85
         strideLength = ((0.415 * height.toDouble().pow(1.12) - (weight * 0.036))/100).toFloat()
 
         // initialising map
@@ -230,7 +230,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun isLift(magnetometerMagnitude: Double): Boolean{
-        val magnitudeThreshold = 24.0f
+        val magnitudeThreshold = 22.0f
 
 //        binding.tvMag.text = "$magnetometerMagnitude"
 

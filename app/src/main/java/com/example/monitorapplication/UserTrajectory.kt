@@ -15,7 +15,7 @@ class UserTrajectory @JvmOverloads constructor(
 
     private val paint = Paint().apply {
         color = Color.BLACK
-        strokeWidth = 5f
+        strokeWidth = 10f
         isAntiAlias = true
         style = Paint.Style.STROKE
     }
@@ -34,9 +34,9 @@ class UserTrajectory @JvmOverloads constructor(
         val scale = minOf(
             (width - paddingLeft - paddingRight) / width,
             (height - paddingTop - paddingBottom) / height
-        )
+        ) * 1.2f
         canvas.translate(paddingLeft.toFloat(), paddingTop.toFloat())
-        canvas.scale(scale.toFloat(), scale.toFloat())
+        canvas.scale(scale, scale)
         canvas.translate(width / 2f, height / 2f)
         canvas.drawPath(path, paint)
     }
