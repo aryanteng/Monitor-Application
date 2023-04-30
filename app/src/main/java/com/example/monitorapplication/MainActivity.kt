@@ -18,20 +18,26 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.config.Configuration
-import kotlin.math.pow
-import kotlin.math.sqrt
 import android.Manifest
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.DashPathEffect
 import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.*
 import android.os.Looper
+import android.util.AttributeSet
+import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import kotlin.math.abs
+import androidx.core.content.res.ResourcesCompat
+import kotlin.math.*
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
     // defining binding
@@ -47,6 +53,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private var gravity = FloatArray(3)
     private var linearAcceleration = FloatArray(3)
+    private var lastAzimuth: Double = 0.0
     private var accelerationMagnitudeList : MutableList<Double> = mutableListOf()
     private var zAxisMagnitudeList : MutableList<Float> = mutableListOf()
 
@@ -55,12 +62,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     // defining variables for distance
     private var distance = 0.0
-
-    // defining variables for lift and stairs
-    private var liftThreshold: Float = 1.5f
-    private var stairsThreshold: Float = 2.5f
-    private var isOnStairs: Boolean = false
-    private var isOnLift: Boolean = false
 
     // defining variable for stride length
     private var strideLength = 0f
@@ -71,6 +72,16 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     // Debounce mechanism to prevent multiple steps from being detected in quick succession
     private var lastStepTime: Long = 0
     private val stepDebounceTime = 250 // milliseconds
+
+    private var accelerometerReadings = FloatArray(3)
+
+    // add the following variables for tracking the user's path
+    private val xValues = ArrayList<Float>()
+    private val yValues = ArrayList<Float>()
+    private var previousX = 0f
+    private var previousY = 0f
+    private var currX = 0f
+    private var currY = 0f
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -101,6 +112,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         // calling for location
         getCurrentLocation()
 
+        binding.trajectoryView.setBackgroundColor(Color.GRAY)
+
     }
 
     override fun onResume() {
@@ -117,6 +130,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent) {
         when (event.sensor.type){
             Sensor.TYPE_ACCELEROMETER -> {
+                accelerometerReadings = event.values
                 // a low pass filter to smooth out the accelerometer readings and to remove the contribution of gravity
                 val alpha = 0.8f
                 for (i in gravity.indices){
@@ -140,6 +154,26 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
                     // calling the current location hook
                     getCurrentLocation()
+
+                    val displacement = (stepCount * 0.7 / 1000.0).toFloat()
+                    val deltaX = (displacement * sin(Math.toRadians(lastAzimuth))).toFloat()
+                    val deltaY = (displacement * cos(Math.toRadians(lastAzimuth))).toFloat()
+
+                    // add the displacement to the previous coordinates to get the current coordinates
+                    currX = previousX + deltaX
+                    currY = previousY + deltaY
+
+                    // add the current coordinates to the list of x and y values
+                    xValues.add(currX)
+                    yValues.add(currY)
+
+                    // update the previous coordinates with the current coordinates
+                    previousX = currX
+                    previousY = currY
+
+                    // redraw the user's path on the screen
+                    drawPath()
+
                 }
 
                 if(isStairs(zAxisMagnitude = linearAcceleration[2])){
@@ -178,12 +212,15 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
                     // converting orientation angle from radian to degrees
                     val azimuth = Math.toDegrees(orientation[0].toDouble())
+                    lastAzimuth = azimuth
 
                     // calculating the direction from the azimuth
                     val direction = calculateDirection(azimuth)
 
                     // updating the UI with the direction
                     binding.tvDirection.text = "Direction: $direction"
+
+
                 }
             }
             Sensor.TYPE_MAGNETIC_FIELD -> {
@@ -193,12 +230,34 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
+    private fun drawPath() {
+        Log.d("TAG", "Drawing path: ($previousX, $previousY) -> ($currX, $currY)")
+        // Create a path from the previous coordinates to the current coordinates
+        val path = Path()
+        path.moveTo(previousX, previousY)
+        path.lineTo(currX, currY)
+
+        // Set the paint style and color
+        val paint = Paint()
+        paint.color = Color.RED
+        paint.strokeWidth = 15f
+        paint.isAntiAlias = true
+
+        // Draw the path on the TrajectoryView canvas
+        binding.trajectoryView.addPoint(currX, currY)
+        binding.trajectoryView.invalidate()
+
+        // Update the last coordinates
+        previousX = currX
+        previousY = currY
+    }
+
     private fun isLift(magnetometerMagnitude: Double): Boolean{
         val magnitudeThreshold = 24.0f
 
-        binding.tvMag.text = "$magnetometerMagnitude"
+//        binding.tvMag.text = "$magnetometerMagnitude"
 
-        // Check if the acceleration magnitude is greater than the moving average plus the threshold factor
+        // Check if the magnetometer magnitude is lesser than threshold
         if (magnetometerMagnitude < magnitudeThreshold) {
             return true
         }
@@ -414,17 +473,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         currentMarker.position = GeoPoint(location.latitude, location.longitude)
         binding.map.overlays.add(currentMarker)
         binding.map.controller.setCenter(currentMarker.position)
-        updateLocationUI(location)
         // Record the user's location in the trajectory recorder
         recordLocation(location.latitude, location.longitude)
         // Update the map view with the new trajectory
         updateMapViewWithTrajectory()
     }
 
-    private fun updateLocationUI(location: Location) {
-        // Update the UI with the current location
-        Log.d("LOCATION", "Current location: ${location.latitude}, ${location.longitude}")
-    }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
         // mandatory hook for sensor event listener
