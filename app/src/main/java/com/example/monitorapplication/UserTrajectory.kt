@@ -15,7 +15,7 @@ class UserTrajectory @JvmOverloads constructor(
 
     private val paint = Paint().apply {
         color = Color.BLACK
-        strokeWidth = 50f
+        strokeWidth = 5f
         isAntiAlias = true
         style = Paint.Style.STROKE
     }
