@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         // calling for location
         getCurrentLocation()
 
-        binding.trajectoryView.setBackgroundColor(Color.GRAY)
+        binding.trajectoryView.setBackgroundColor(Color.CYAN)
 
     }
 
@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     // calling the current location hook
                     getCurrentLocation()
 
-                    val displacement = (stepCount * 0.7 / 1000.0).toFloat()
+                    val displacement = strideLength
                     val deltaX = (displacement * sin(Math.toRadians(lastAzimuth))).toFloat()
                     val deltaY = (displacement * cos(Math.toRadians(lastAzimuth))).toFloat()
 
@@ -167,12 +167,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     xValues.add(currX)
                     yValues.add(currY)
 
+                    binding.trajectoryView.addPoint(currX, currY)
+                    binding.trajectoryView.invalidate()
+
                     // update the previous coordinates with the current coordinates
                     previousX = currX
                     previousY = currY
-
-                    // redraw the user's path on the screen
-                    drawPath()
 
                 }
 

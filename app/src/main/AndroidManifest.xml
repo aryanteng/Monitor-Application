@@ -13,7 +13,7 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="StepUp"
+        android:label="Step Up"
         android:supportsRtl="true"
         android:theme="@style/Theme.MonitorApplication"
         android:hardwareAccelerated="true"
