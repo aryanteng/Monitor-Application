@@ -65,6 +65,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var lastStepTime: Long = 0
     private val stepDebounceTime = 250 // milliseconds
 
+    // Debounce mechanism to prevent multiple toasts to show in quick succession
+    private var lastStairsToastTime: Long = 0
+    private var stairsToastDebounceTime = 2000 // milliseconds
+
     private var accelerometerReadings = FloatArray(3)
 
     // add the following variables for tracking the user's path
@@ -170,7 +174,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
                 if(isStairs(zAxisMagnitude = linearAcceleration[2])){
                     binding.tvStairs.text = "Stairs"
-                    Toast.makeText(this, "Stairs", Toast.LENGTH_SHORT).show()
+                    val currentTime = System.currentTimeMillis()
+                    if(currentTime - lastStairsToastTime > stairsToastDebounceTime){
+                        Toast.makeText(this, "Stairs", Toast.LENGTH_SHORT).show()
+                        lastStairsToastTime = currentTime
+                    }
                 }
                 else{
                     binding.tvStairs.text = ""
@@ -211,7 +219,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
                     // updating the UI with the direction
                     binding.tvDirection.text = "Direction: $direction"
-
 
                 }
             }
