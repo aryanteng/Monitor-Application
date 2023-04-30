@@ -19,24 +19,17 @@ import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.config.Configuration
 import android.Manifest
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.DashPathEffect
 import android.graphics.Paint
 import android.graphics.Path
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.*
 import android.os.Looper
-import android.util.AttributeSet
-import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.core.content.res.ResourcesCompat
 import kotlin.math.*
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
@@ -241,7 +234,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         paint.strokeWidth = 15f
         paint.isAntiAlias = true
 
-        // Draw the path on the TrajectoryView canvas
+        // Draw the path on the com.example.monitorapplication.TrajectoryView canvas
         binding.trajectoryView.addPoint(currX, currY)
         binding.trajectoryView.invalidate()
 
