@@ -7,7 +7,6 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
 import android.util.Log
-import android.view.ScaleGestureDetector
 import android.view.View
 
 class TrajectoryView @JvmOverloads constructor(
@@ -16,62 +15,43 @@ class TrajectoryView @JvmOverloads constructor(
 
     private val paint = Paint().apply {
         color = Color.BLACK
-        strokeWidth = 10f
+        strokeWidth = 200f
         isAntiAlias = true
         style = Paint.Style.STROKE
     }
 
     private val path = Path()
-    private var minWidth = 0f
-    private var minHeight = 0f
-    private var scaleFactor = 1f
 
     fun addPoint(x: Float, y: Float) {
         Log.i("ADD POINT", "$x,$y")
-        path.lineTo(x, y)
-        minWidth += x
-        minHeight += y
+        if (path.isEmpty) {
+            path.moveTo(x - width / 2f, y - height / 2f)
+        } else {
+            path.lineTo(x - width / 2f, y - height / 2f)
+        }
         requestLayout()
         invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas.save()
         val scale = minOf(
-            (width - paddingLeft - paddingRight) / canvas.width,
-            (height - paddingTop - paddingBottom) / canvas.height
+            (width - paddingLeft - paddingRight) / width,
+            (height - paddingTop - paddingBottom) / height
         )
-        val scaledWidth = canvas.width * scale
-        val scaledHeight = canvas.height * scale
-        val dx = (width - scaledWidth) / 2
-        val dy = (height - scaledHeight) / 2
-        canvas.translate(dx.toFloat(), dy.toFloat())
+        canvas.translate(paddingLeft.toFloat(), paddingTop.toFloat())
         canvas.scale(scale.toFloat(), scale.toFloat())
+        canvas.translate(width / 2f, height / 2f)
         canvas.drawPath(path, paint)
-        canvas.restore()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val width = resolveSizeAndState(
-            minWidth.toInt() + paddingLeft + paddingRight,
-            widthMeasureSpec,
-            0
+        val desiredWidth = suggestedMinimumWidth + paddingLeft + paddingRight
+        val desiredHeight = suggestedMinimumHeight + paddingTop + paddingBottom
+        setMeasuredDimension(
+            resolveSize(desiredWidth, widthMeasureSpec),
+            resolveSize(desiredHeight, heightMeasureSpec)
         )
-        val height = resolveSizeAndState(
-            minHeight.toInt() + paddingTop + paddingBottom,
-            heightMeasureSpec,
-            0
-        )
-        setMeasuredDimension(width, height)
-    }
-
-    private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
-        override fun onScale(detector: ScaleGestureDetector): Boolean {
-            scaleFactor *= detector.scaleFactor
-            scaleFactor = scaleFactor.coerceAtLeast(0.1f).coerceAtMost(5.0f)
-            invalidate()
-            return true
-        }
     }
 }
+
