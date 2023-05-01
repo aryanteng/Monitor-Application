@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         // calling for location
         getCurrentLocation()
 
-        binding.tvDisplacement.text = "Displacement: 0.0 cm"
+        binding.tvDisplacement.text = "Displacement: 0.0 m"
 
     }
 
@@ -172,7 +172,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     previousX = currX
                     previousY = currY
 
-                    binding.tvDisplacement.text = "Displacement: ${sqrt(previousX.pow(2) + previousY.pow(2))} cm"
+                    binding.tvDisplacement.text = "Displacement: ${sqrt(previousX.pow(2) + previousY.pow(2))/100} m"
 
                     Log.i("DISPLACEMENT", "${sqrt(previousX.pow(2) + previousY.pow(2))} cm")
 
