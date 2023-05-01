@@ -108,6 +108,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         // calling for location
         getCurrentLocation()
 
+        binding.tvDisplacement.text = "Displacement: 0.0 cm"
+
     }
 
     override fun onResume() {
@@ -151,7 +153,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     // calling the current location hook
                     getCurrentLocation()
 
-                    val displacement = strideLength
+                    val displacement = strideLength / 2
                     val deltaX = (displacement * sin(Math.toRadians(lastAzimuth))).toFloat()
                     val deltaY = (displacement * cos(Math.toRadians(lastAzimuth))).toFloat()
 
@@ -170,7 +172,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     previousX = currX
                     previousY = currY
 
-                    Log.i("DISPLACEMENT", "${sqrt(previousX.pow(2) + previousY.pow(2))}")
+                    binding.tvDisplacement.text = "Displacement: ${sqrt(previousX.pow(2) + previousY.pow(2))} cm"
+
+                    Log.i("DISPLACEMENT", "${sqrt(previousX.pow(2) + previousY.pow(2))} cm")
 
                 }
 
