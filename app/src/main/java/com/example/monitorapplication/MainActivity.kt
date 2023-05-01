@@ -94,7 +94,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         // stride length calculation
         val height = 177
         val weight = 85
-        strideLength = ((0.415 * height.toDouble().pow(1.12) - (weight * 0.036))/100).toFloat()
+        strideLength = 0.415f * height
 
         // initialising map
         Configuration.getInstance().userAgentValue = packageName
@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     // increment step count
                     stepCount++
                     // stride length is distance covered in 2 steps so after one step it should be half the stride length
-                    distance += strideLength / 2
+                    distance += strideLength / 2 / 100
 
                     // calling the current location hook
                     getCurrentLocation()
