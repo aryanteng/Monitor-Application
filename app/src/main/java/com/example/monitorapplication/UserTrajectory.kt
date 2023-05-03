@@ -41,7 +41,7 @@ class UserTrajectory @JvmOverloads constructor(
         val centerX = canvasWidth / 2f
         val centerY = canvasHeight / 2f
         canvas.translate(centerX, centerY)
-        canvas.scale(scale, scale)
+        canvas.scale(scale, -scale)
         canvas.drawPath(path, paint)
     }
 
