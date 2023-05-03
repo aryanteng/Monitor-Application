@@ -68,6 +68,5 @@ class UserTrajectory @JvmOverloads constructor(
         }
     }
 
-
 }
 
