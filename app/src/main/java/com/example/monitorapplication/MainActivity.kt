@@ -409,17 +409,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
             ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Request the permission to access the location if it is not already granted
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 123)
             return
         }
-        // Get the last known location from the location manager
         val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
         if (location != null) {
-            // If the location is not null, update the UI with the current location
             updateMapUI(location)
         } else {
-            // If the location is null, request location updates
             val locationRequest = LocationRequest.create().apply {
                 priority = LocationRequest.PRIORITY_HIGH_ACCURACY
                 interval = 10000
@@ -433,7 +429,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     }
                 }
             }
-            // Request location updates
             val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
         }
@@ -446,12 +441,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         currentMarker.position = GeoPoint(location.latitude, location.longitude)
         binding.map.overlays.add(currentMarker)
         binding.map.controller.setCenter(currentMarker.position)
-        // Record the user's location in the trajectory recorder
         recordLocation(location.latitude, location.longitude)
-        // Update the map view with the new trajectory
         updateMapViewWithTrajectory()
     }
-
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
         // mandatory hook for sensor event listener
