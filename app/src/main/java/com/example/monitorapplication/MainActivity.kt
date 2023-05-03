@@ -232,12 +232,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun isLift(magnetometerMagnitude: Double): Boolean{
-        val magnitudeThreshold = 22.0f
+        val magnitudeThreshold = 25.0f
 
         binding.tvMagnetometer.text = "Magnetometer: ${magnetometerMagnitude.toFloat()}"
 
         // Check if the magnetometer magnitude is lesser than threshold
-        if (magnetometerMagnitude < magnitudeThreshold) {
+        if (magnetometerMagnitude <= magnitudeThreshold) {
             return true
         }
 
