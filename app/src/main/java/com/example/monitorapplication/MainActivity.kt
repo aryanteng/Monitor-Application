@@ -66,19 +66,17 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private val stepDebounceTime = 250 // milliseconds
 
     // Debounce mechanism to prevent multiple toasts to show in quick succession
+    private var lastLiftToastTime: Long = 0
     private var lastStairsToastTime: Long = 0
-    private var stairsToastDebounceTime = 2000 // milliseconds
+    private var toastDebounceTime = 2000 // milliseconds
 
     private var accelerometerReadings = FloatArray(3)
 
-    // add the following variables for tracking the user's path
-    private val xValues = ArrayList<Float>()
-    private val yValues = ArrayList<Float>()
+    // variables for tracking the user's path
     private var previousX = 0f
     private var previousY = 0f
     private var currX = 0f
     private var currY = 0f
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -161,10 +159,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     currX = previousX + deltaX
                     currY = previousY + deltaY
 
-                    // add the current coordinates to the list of x and y values
-                    xValues.add(currX)
-                    yValues.add(currY)
-
                     binding.userTrajectory.addPoint(currX, currY)
                     binding.userTrajectory.invalidate()
 
@@ -180,19 +174,19 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
                 if(isStairs(zAxisMagnitude = linearAcceleration[2])){
                     val currentTime = System.currentTimeMillis()
-                    if (currentTime - lastStairsToastTime > stairsToastDebounceTime){
+                    if (currentTime - lastStairsToastTime > toastDebounceTime){
                         Toast.makeText(this, "Stairs", Toast.LENGTH_SHORT).show()
                         lastStairsToastTime = currentTime
                     }
                 }
 
                 if (magnetometerValues.isNotEmpty()) {
-                    val magnetometerMagnitude = calculateMagnitude(magnetometerValues)
-                    if (isLift(magnetometerMagnitude = magnetometerMagnitude)){
-                        binding.tvLift.text = "Lift"
-                    }
-                    else {
-                        binding.tvLift.text = ""
+                    if (isLift(magnetometerMagnitude = calculateMagnitude(magnetometerValues))){
+                        val currentTime = System.currentTimeMillis()
+                        if (currentTime - lastLiftToastTime > toastDebounceTime){
+                            Toast.makeText(this, "Lift", Toast.LENGTH_SHORT).show()
+                            lastLiftToastTime = currentTime
+                        }
                     }
                 }
 

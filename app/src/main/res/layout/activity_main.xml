@@ -53,14 +53,6 @@
         android:textColor="@color/theme"
         android:textSize="20sp" />
 
-    <TextView
-        android:id="@+id/tv_lift"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/medium"
-        android:textColor="@color/theme"
-        android:textSize="20sp" />
-
     <org.osmdroid.views.MapView
         android:id="@+id/map"
         android:layout_width="match_parent"
