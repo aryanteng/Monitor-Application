@@ -146,12 +146,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     // increment step count
                     stepCount++
                     // stride length is distance covered in 2 steps so after one step it should be half the stride length
-                    distance += strideLength / 2 / 100
+                    distance += strideLength / 100
 
                     // calling the current location hook
                     getCurrentLocation()
 
-                    val displacement = strideLength / 2
+                    val displacement = strideLength
                     val deltaX = (displacement * sin(Math.toRadians(lastAzimuth))).toFloat()
                     val deltaY = (displacement * cos(Math.toRadians(lastAzimuth))).toFloat()
 
