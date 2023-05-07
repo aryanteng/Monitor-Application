@@ -14,6 +14,14 @@
         android:textSize="20sp" />
 
     <TextView
+        android:id="@+id/tv_stride"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/medium"
+        android:textColor="@color/theme"
+        android:textSize="20sp" />
+
+    <TextView
         android:id="@+id/tv_distance"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

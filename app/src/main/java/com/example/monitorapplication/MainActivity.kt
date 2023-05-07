@@ -93,6 +93,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val height = 177
         val weight = 85
         strideLength = 0.415f * height
+        binding.tvStride.text = "Stride Length: $strideLength cm"
 
         // initialising map
         Configuration.getInstance().userAgentValue = packageName
