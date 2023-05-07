@@ -89,10 +89,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
+        // receive intent
+        val height = intent.getStringExtra("height").toString()
+        Log.i("HEIGHT", height)
+
         // stride length calculation
-        val height = 177
-        val weight = 85
-        strideLength = 0.415f * height
+        strideLength = 0.415f * height.toInt()
         binding.tvStride.text = "Stride Length: $strideLength cm"
 
         // initialising map
